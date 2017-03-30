@@ -52,7 +52,7 @@ let ``Schema config should be able to override default error handling`` () =
         }
     }
     """
-    let actual = sync <| schema.AsyncExecute query
+    let actual = sync <| Executor(schema).AsyncExecute query
     let expected = 
          NameValueLookup.ofList [
             "test", box <| NameValueLookup.ofList [

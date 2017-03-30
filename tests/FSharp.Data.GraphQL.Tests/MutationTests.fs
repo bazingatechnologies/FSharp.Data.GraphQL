@@ -63,7 +63,7 @@ let ``Execute handles mutation execution ordering: evaluates mutations serially`
       }
     }"""
 
-    let mutationResult = sync <| schema.AsyncExecute(parse query, {NumberHolder = {Number = 6}})
+    let mutationResult = sync <| Executor(schema).AsyncExecute(parse query, {NumberHolder = {Number = 6}})
     let expected =
       NameValueLookup.ofList [
         "first",  upcast NameValueLookup.ofList [ "theNumber", 1 :> obj]
@@ -99,7 +99,7 @@ let ``Execute handles mutation execution ordering: evaluates mutations correctly
     }"""
 
     let data = {NumberHolder = {Number = 6}}
-    let mutationResult = sync <| schema.AsyncExecute(parse query, data)
+    let mutationResult = sync <| Executor(schema).AsyncExecute(parse query, data)
     let expected =
       NameValueLookup.ofList [
         "first",  upcast NameValueLookup.ofList [ "theNumber", 1 :> obj]
@@ -120,7 +120,7 @@ let ``Execute handles mutation with multiple arguments`` () =
       }
     }"""
 
-    let mutationResult = sync <| schema.AsyncExecute(parse query, {NumberHolder = {Number = 6}}, Map.ofList [ "arg1", box 3; "arg2", box 33])
+    let mutationResult = sync <| Executor(schema).AsyncExecute(parse query, {NumberHolder = {Number = 6}}, Map.ofList [ "arg1", box 3; "arg2", box 33])
     let expected =
       NameValueLookup.ofList [
         "immediatelyChangeTheNumber", upcast NameValueLookup.ofList [ "theNumber", box 33]

@@ -1,6 +1,5 @@
 ﻿/// The MIT License (MIT)
 /// Copyright (c) 2016 Bazinga Technologies Inc
-
 module FSharp.Data.GraphQL.Execution
 
 open System
@@ -17,21 +16,6 @@ open FSharp.Data.GraphQL.Introspection
 open FSharp.Quotations
 open FSharp.Quotations.Patterns
 open FSharp.Reflection.FSharpReflectionExtensions
-
-type FieldExecuteMap () = 
-    let fieldExecuteMap = new Dictionary<string * string, ExecuteField>();
-
-    member public this.SetExecute(typeName: string, fieldName: string, executeField: ExecuteField) = 
-        let key = typeName, fieldName
-        if not (fieldExecuteMap.ContainsKey(key)) then fieldExecuteMap.Add(key, executeField)
-
-    member public this.GetExecute(typeName: string, fieldName: string) = 
-        let key = 
-            if List.exists ((=) fieldName) ["__schema"; "__type"; "__typename" ]
-            then "", fieldName
-            else typeName, fieldName
-
-        if fieldExecuteMap.ContainsKey(key) then fieldExecuteMap.[key] else Unchecked.defaultof<ExecuteField>
 
 /// Name value lookup used as output to be serialized into JSON.
 /// It has a form of a dictionary with fixed set of keys. Values under keys
@@ -280,9 +264,9 @@ let rec private createCompletion (possibleTypesFn: TypeDef -> ObjectDef []) (ret
     | _ -> failwithf "Unexpected value of returnDef: %O" returnDef
 
 and internal compileField possibleTypesFn (fieldDef: FieldDef) (fieldExecuteMap: FieldExecuteMap) : ExecuteField =
-    let completed = createCompletion possibleTypesFn (fieldDef.TypeDef) fieldExecuteMap
     match fieldDef.Resolve with
     | Resolve.BoxedSync(inType, outType, resolve) ->
+        let completed = createCompletion possibleTypesFn (fieldDef.TypeDef) fieldExecuteMap
         fun resolveFieldCtx value ->
             try
                 let res = resolve resolveFieldCtx value
@@ -298,11 +282,24 @@ and internal compileField possibleTypesFn (fieldDef: FieldDef) (fieldExecuteMap:
                 AsyncVal.empty
 
     | Resolve.BoxedAsync(inType, outType, resolve) ->
+        let completed = createCompletion possibleTypesFn (fieldDef.TypeDef) fieldExecuteMap
         fun resolveFieldCtx value -> 
             try
                 resolve resolveFieldCtx value
                 |> AsyncVal.ofAsync
                 |> AsyncVal.bind (completed resolveFieldCtx)
+            with
+            | :? AggregateException as e ->
+                e.InnerExceptions |> Seq.iter (resolveFieldCtx.AddError)
+                AsyncVal.empty
+            | ex -> 
+                resolveFieldCtx.AddError(ex)
+                AsyncVal.empty
+
+    | Resolve.BoxedExpr (resolve) ->
+        fun resolveFieldCtx value -> 
+            try
+                downcast resolve resolveFieldCtx value
             with
             | :? AggregateException as e ->
                 e.InnerExceptions |> Seq.iter (resolveFieldCtx.AddError)

@@ -88,6 +88,7 @@
     <Compile Include="LinqTests.fs" />
     <None Include="paket.references" />
     <Content Include="App.config" />
+    <Compile Include="RemoteInstanceTests.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\FSharp.Data.GraphQL.Server\FSharp.Data.GraphQL.Server.fsproj">

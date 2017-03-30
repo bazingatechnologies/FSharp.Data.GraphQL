@@ -78,10 +78,11 @@ and Query = Define.Object<obj list>("Query", [
 ])
 
 let schema = Schema(Query)
+let schemaProcessor = Executor(schema)
 
 [<Fact>]
 let ``Property tracker can track indirect properties`` () =
-    let plan = schema.CreateExecutionPlan("""
+    let plan = schemaProcessor.CreateExecutionPlan("""
     {
         people {
             fullName
@@ -98,7 +99,7 @@ let ``Property tracker can track indirect properties`` () =
 
 [<Fact>]
 let ``Property tracker can correctly jump over properties not being part of the tracked chain`` () =
-    let plan = schema.CreateExecutionPlan("""
+    let plan = schemaProcessor.CreateExecutionPlan("""
     {
         people {
             friends {

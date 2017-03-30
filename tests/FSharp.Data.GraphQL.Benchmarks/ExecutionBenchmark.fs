@@ -94,6 +94,7 @@ type SimpleExecutionBenchmark() =
     }"""
 
     let mutable schema : Schema<unit> = Unchecked.defaultof<Schema<unit>>
+    let mutable schemaProcessor : Executor = Unchecked.defaultof<Executor>
     let mutable simpleAst : Ast.Document = Unchecked.defaultof<Ast.Document>
     let mutable flatAst : Ast.Document = Unchecked.defaultof<Ast.Document>
     let mutable nestedAst : Ast.Document = Unchecked.defaultof<Ast.Document>
@@ -104,37 +105,38 @@ type SimpleExecutionBenchmark() =
     [<Setup>]
     member x.Setup() = 
         schema <- Schema(Query)
+        schemaProcessor <- Executor(schema)
         simpleAst <- parse simpleQueryString
         flatAst <- parse flatQueryString
         nestedAst <- parse nestedQueryString
-        simpleExecutionPlan <- schema.CreateExecutionPlan(simpleAst)
-        flatExecutionPlan <- schema.CreateExecutionPlan(flatAst)
-        nestedExecutionPlan <- schema.CreateExecutionPlan(nestedAst)
+        simpleExecutionPlan <- schemaProcessor.CreateExecutionPlan(simpleAst)
+        flatExecutionPlan <- schemaProcessor.CreateExecutionPlan(flatAst)
+        nestedExecutionPlan <- schemaProcessor.CreateExecutionPlan(nestedAst)
     
     [<Benchmark>]
-    member x.BenchmarkSimpleQueryUnparsed() = schema.AsyncExecute(simpleQueryString) |> Async.RunSynchronously
+    member x.BenchmarkSimpleQueryUnparsed() = schemaProcessor.AsyncExecute(simpleQueryString) |> Async.RunSynchronously
     
     [<Benchmark>]
-    member x.BenchmarkSimpleQueryParsed() = schema.AsyncExecute(simpleAst) |> Async.RunSynchronously
+    member x.BenchmarkSimpleQueryParsed() = schemaProcessor.AsyncExecute(simpleAst) |> Async.RunSynchronously
     
     [<Benchmark>]
-    member x.BenchmarkSimpleQueryPlanned() = schema.AsyncExecute(simpleExecutionPlan) |> Async.RunSynchronously
+    member x.BenchmarkSimpleQueryPlanned() = schemaProcessor.AsyncExecute(simpleExecutionPlan) |> Async.RunSynchronously
     
     [<Benchmark>]
-    member x.BenchmarkFlatQueryUnparsed() = schema.AsyncExecute(flatQueryString) |> Async.RunSynchronously
+    member x.BenchmarkFlatQueryUnparsed() = schemaProcessor.AsyncExecute(flatQueryString) |> Async.RunSynchronously
     
     [<Benchmark>]
-    member x.BenchmarkFlatQueryParsed() = schema.AsyncExecute(flatAst) |> Async.RunSynchronously
+    member x.BenchmarkFlatQueryParsed() = schemaProcessor.AsyncExecute(flatAst) |> Async.RunSynchronously
     
     [<Benchmark>]
-    member x.BenchmarkFlatQueryPlanned() = schema.AsyncExecute(flatExecutionPlan) |> Async.RunSynchronously
+    member x.BenchmarkFlatQueryPlanned() = schemaProcessor.AsyncExecute(flatExecutionPlan) |> Async.RunSynchronously
     
     [<Benchmark>]
-    member x.BenchmarkNestedQueryUnparsed() = schema.AsyncExecute(nestedQueryString) |> Async.RunSynchronously
+    member x.BenchmarkNestedQueryUnparsed() = schemaProcessor.AsyncExecute(nestedQueryString) |> Async.RunSynchronously
     
     [<Benchmark>]
-    member x.BenchmarkNestedQueryParsed() = schema.AsyncExecute(nestedAst) |> Async.RunSynchronously
+    member x.BenchmarkNestedQueryParsed() = schemaProcessor.AsyncExecute(nestedAst) |> Async.RunSynchronously
     
     [<Benchmark>]
-    member x.BenchmarkNestedQueryPlanned() = schema.AsyncExecute(nestedExecutionPlan) |> Async.RunSynchronously
+    member x.BenchmarkNestedQueryPlanned() = schemaProcessor.AsyncExecute(nestedExecutionPlan) |> Async.RunSynchronously
 

@@ -14,10 +14,10 @@ type Data = { A: string; B: string }
 let data = { A = "a"; B = "b" }
 
 let schema = 
-    Schema(Define.Object("TestType", [ Define.AutoField("a", String); Define.AutoField("b", String) ]))
+    Schema(Define.Object("TestType", [ Define.AutoField("a", String); Define.AutoField("b", String) ])) :> Schema<Data>
 
 let private execAndCompare query expected =
-    let actual = sync <| schema.AsyncExecute(parse query, data)
+    let actual = sync <| Executor(schema).AsyncExecute(parse query, data)
     noErrors actual
     actual.["data"] |> equals (upcast expected)
     

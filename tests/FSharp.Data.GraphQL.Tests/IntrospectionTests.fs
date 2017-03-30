@@ -26,7 +26,7 @@ type IntrospectionData = {
 let ``Introspection schema should be serializable back and forth using json`` () =
     let root = Define.Object("Query", [ Define.Field("onlyField", String) ])
     let schema = Schema(root)
-    let introResult = schema.AsyncExecute(Introspection.introspectionQuery) |> sync
+    let introResult = Executor(schema).AsyncExecute(Introspection.introspectionQuery) |> sync
     let json = toJson introResult
     let deserialized:IntrospectionData = Helpers.fromJson json
     deserialized.Data.__schema |> equals (schema :> ISchema).Introspected
@@ -51,7 +51,7 @@ let ``Core type definitions are considered nullable`` () =
         }
       }
     } }"""
-    let result = sync <| schema.AsyncExecute(query)
+    let result = sync <| Executor(schema).AsyncExecute(query)
     let expected =
       NameValueLookup.ofList [
         "__type", upcast NameValueLookup.ofList [
@@ -76,7 +76,7 @@ let ``Introspection works with query and mutation sharing same generic param`` =
     let Mutation = Define.Object<User list>("Mutation", [
         Define.Field("addUser", User, fun _ u -> u |> List.head)])
     let schema = Schema(Query, Mutation)
-    let introResult = schema.AsyncExecute(Introspection.introspectionQuery) |> sync
+    let introResult = Executor(schema).AsyncExecute(Introspection.introspectionQuery) |> sync
     ()
     
 [<Fact>]
@@ -104,7 +104,7 @@ let ``Default field type definitions are considered non-null`` () =
         }
       }
     } }"""
-    let result = sync <| schema.AsyncExecute(query)
+    let result = sync <| Executor(schema).AsyncExecute(query)
     let expected =
       NameValueLookup.ofList [
         "__type", upcast NameValueLookup.ofList [
@@ -146,7 +146,7 @@ let ``Nullabe field type definitions are considered nullable`` () =
         }
       }
     } }"""
-    let result = sync <| schema.AsyncExecute(query)
+    let result = sync <| Executor(schema).AsyncExecute(query)
     let expected =
       NameValueLookup.ofList [
         "__type", upcast NameValueLookup.ofList [
@@ -187,7 +187,7 @@ let ``Default field args type definitions are considered non-null`` () =
         }
       }
     } }"""
-    let result = sync <| schema.AsyncExecute(query)
+    let result = sync <| Executor(schema).AsyncExecute(query)
     let expected =
       NameValueLookup.ofList [
         "__type", upcast NameValueLookup.ofList [
@@ -233,7 +233,7 @@ let ``Nullable field args type definitions are considered nullable`` () =
         }
       }
     } }"""
-    let result = sync <| schema.AsyncExecute(query)
+    let result = sync <| Executor(schema).AsyncExecute(query)
     let expected =
       NameValueLookup.ofList [
         "__type", upcast NameValueLookup.ofList [
@@ -254,7 +254,7 @@ let ``Introspection executes an introspection query`` () =
     let root = Define.Object("QueryRoot", [ Define.Field("onlyField", String) ])
     let schema = Schema(root)
     let (Patterns.Object raw) = root
-    let result = sync <| schema.AsyncExecute(parse Introspection.introspectionQuery, raw)
+    let result = sync <| Executor(schema).AsyncExecute(parse Introspection.introspectionQuery, raw)
     noErrors result
     let expected =
       NameValueLookup.ofList [

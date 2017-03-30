@@ -53,7 +53,7 @@ let schema = Schema<unit>(Define.Object("Query", [ Define.NodeField(Node, resolv
 open Xunit
 
 let execAndValidateNode (query: string) expected =
-    let result = sync <| schema.AsyncExecute(query)
+    let result = sync <| Executor(schema).AsyncExecute(query)
     noErrors result
     result.["data"] |> equals (upcast NameValueLookup.ofList ["node", upcast expected])
    
