@@ -1,4 +1,4 @@
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2026
 MinimumVisualStudioVersion = 10.0.40219.1
@@ -102,6 +102,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{BEFD8748-246
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "FSharp.Data.GraphQL.Server.Middlewares", "src/FSharp.Data.GraphQL.Server.Middlewares/FSharp.Data.GraphQL.Server.Middlewares.fsproj", "{8FB23F61-77CB-42C7-8EEC-B22D7C4E4067}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Data.GraphQL.Server.Middlewares.AspNetCore", "src/FSharp.Data.GraphQL.Server.Middlewares.AspNetCore/FSharp.Data.GraphQL.Server.Middlewares.AspNetCore.fsproj", "{73A3EA1A-BC76-4B96-A129-A891EB4FB9AC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -196,6 +198,18 @@ Global
 		{8FB23F61-77CB-42C7-8EEC-B22D7C4E4067}.Release|x64.Build.0 = Release|Any CPU
 		{8FB23F61-77CB-42C7-8EEC-B22D7C4E4067}.Release|x86.ActiveCfg = Release|Any CPU
 		{8FB23F61-77CB-42C7-8EEC-B22D7C4E4067}.Release|x86.Build.0 = Release|Any CPU
+		{73A3EA1A-BC76-4B96-A129-A891EB4FB9AC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{73A3EA1A-BC76-4B96-A129-A891EB4FB9AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{73A3EA1A-BC76-4B96-A129-A891EB4FB9AC}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{73A3EA1A-BC76-4B96-A129-A891EB4FB9AC}.Debug|x64.Build.0 = Debug|Any CPU
+		{73A3EA1A-BC76-4B96-A129-A891EB4FB9AC}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{73A3EA1A-BC76-4B96-A129-A891EB4FB9AC}.Debug|x86.Build.0 = Debug|Any CPU
+		{73A3EA1A-BC76-4B96-A129-A891EB4FB9AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{73A3EA1A-BC76-4B96-A129-A891EB4FB9AC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{73A3EA1A-BC76-4B96-A129-A891EB4FB9AC}.Release|x64.ActiveCfg = Release|Any CPU
+		{73A3EA1A-BC76-4B96-A129-A891EB4FB9AC}.Release|x64.Build.0 = Release|Any CPU
+		{73A3EA1A-BC76-4B96-A129-A891EB4FB9AC}.Release|x86.ActiveCfg = Release|Any CPU
+		{73A3EA1A-BC76-4B96-A129-A891EB4FB9AC}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -217,6 +231,7 @@ Global
 		{D381D216-2464-4F84-8DFF-2CB2F2507DDE} = {766203BF-7108-418F-BE92-87E7006E5E94}
 		{C7DA852B-D30A-4209-B767-640224C7C31E} = {BEFD8748-2467-45F9-A4AD-B450B12D5F78}
 		{8FB23F61-77CB-42C7-8EEC-B22D7C4E4067} = {BEFD8748-2467-45F9-A4AD-B450B12D5F78}
+		{73A3EA1A-BC76-4B96-A129-A891EB4FB9AC} = {BEFD8748-2467-45F9-A4AD-B450B12D5F78}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C5B9895C-9DF8-4557-8D44-7D0C4C31F86E}

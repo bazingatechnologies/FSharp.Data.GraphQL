@@ -447,6 +447,10 @@ Target "PublishMiddlewares" (fun _ ->
     publishPackage "Server.Middlewares"
 )
 
+Target "PublishAspNetCoreMiddlewares" (fun _ ->
+    publishPackage "Server.Middlewares.AspNetCore"
+)
+
 Target "PackServer" (fun _ ->
     pack "Server"
 )
@@ -457,6 +461,10 @@ Target "PackClient" (fun _ ->
 
 Target "PackMiddlewares" (fun _ ->
     pack "Server.Middlewares"
+)
+
+Target "PackAspNetCoreMiddlewares" (fun _ ->
+    pack "Server.Middlewares.AspNetCore"
 )
 
 Target "PublishNpm" (fun _ ->

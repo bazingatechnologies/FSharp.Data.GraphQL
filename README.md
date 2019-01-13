@@ -154,6 +154,45 @@ let updatedHero = { hero with Name = "Han Solo - Test" }
 schemaConfig.LiveFieldSubscriptionProvider.Publish "Hero" "name" updatedHero
 ```
 
+## File upload and multipart requests
+
+Server component now supports multipart request, which enables features like file upload in mutation queries. This feature is still experimental, and is built based on [this specification](https://github.com/jaydenseric/graphql-multipart-request-spec).
+
+To support it, first install `FSharp.Data.GraphQL.Server.Middlewares.AspNetCore` package. The component has a special GraphQL input type called `Upload` which can be used on mutation queries. This input type is based on a scalar definition of the `System.IO.Stream` type, which can not be parsed as an input by normal means - only by a multipart request reader.
+
+```fsharp
+type File =
+    { Name : string
+      ContentType : string
+      Content : Stream }
+
+let Upload : InputObjectDefinition<File> =
+    { Name = "Upload"
+        Description = Some "The `Upload` type is used to represent a file upload to the server."
+        FieldsFn = fun () ->
+        [|
+            Define.Input("name", String, description = "Gets the name of the file.")
+            Define.Input("contentType", String, description = "Gets the MIME content type of the file.")
+            Define.Input("content", Stream, description = "Gets the content of the file.")
+        |] }
+
+type Operation =
+    { Query : string
+      Variables : Map<string, obj> }
+
+type MultipartRequest =
+    { Operations : Operation list }
+```
+
+To be able to run a query using multipart request, that request must be read using a `Microsoft.AspNetCore.WebUtilities.MultipartReader`. After that, it can be parsed into a `MultipartRequest` object, using the `MultipartRequest` module. This parsing will automatically converts uploaded files unsing the spec into the `File` object.
+
+```fsharp
+let reader = MultipartReader(boundary, requestStream)
+let request = MultipartRequest.read reader |> Async.AwaitTask |> Async.RunSynchronously
+```
+
+An example on how to use this feature can be seen in the Giraffe sample project.
+
 ## Middlewares
 
 You can create and use middlewares on top of the `Executor<'Root>` object.

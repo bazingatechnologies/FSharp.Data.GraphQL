@@ -7,6 +7,7 @@ nuget System.Reactive
 nuget Newtonsoft.Json
 nuget System.Runtime
 nuget FSharp.Core
+nuget Microsoft.AspNetCore.WebUtilities
 
 group Samples
   source https://nuget.org/api/v2

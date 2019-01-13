@@ -5,9 +5,7 @@ namespace FSharp.Data.GraphQL.Samples.GiraffeServer
 open FSharp.Data.GraphQL
 open FSharp.Data.GraphQL.Types
 open FSharp.Data.GraphQL.Server.Middlewares
-open System.Threading
-open System.Threading.Tasks
-open FSharp.Data.GraphQL.Ast
+open FSharp.Data.GraphQL.Server.Middlewares.AspNetCore
 
 type Episode =
     | NewHope = 1
@@ -60,6 +58,11 @@ type Box() =
 type Character =
     | Human of Human
     | Droid of Droid
+
+type UploadedFile =
+    { Content : string
+      ContentType : string
+      FileName : string }
 
 module Schema =
     let humans =
@@ -169,6 +172,18 @@ module Schema =
                 Define.Field("id", String, "The ID of the box", fun _ (t : Box) -> t.Id)
             ]
         )
+
+    let UploadedFileType : ObjectDef<UploadedFile> =
+        Define.Object<UploadedFile>(
+            name = "UploadedFile",
+            description = "A file upload operation.",
+            isTypeOf = (fun o -> o :? UploadedFile),
+            fieldsFn = fun () ->
+            [
+                Define.Field("fileName", String, "The name of the file.", fun _ u -> u.FileName)
+                Define.Field("contentType", String, "The MIME type of the file.", fun _ u -> u.ContentType)
+                Define.Field("content", String, "The content of the file as text.", fun _ u -> u.Content)
+            ])
 
     let EpisodeType =
         Define.Enum(
@@ -284,7 +299,17 @@ module Schema =
                             x.SetMoon(Some(ctx.Arg("ismoon"))) |> ignore
                             schemaConfig.SubscriptionProvider.Publish<Planet> "watchMoon" x
                             schemaConfig.LiveFieldSubscriptionProvider.Publish<Planet> "Planet" "ismoon" x
-                            x))])
+                            x))
+                Define.Field(
+                    "uploadFile",
+                    UploadedFileType,
+                    "Uploads a file to the server and send its content back as text",
+                    [ Define.Input("file", Upload) ],
+                    fun ctx _ ->
+                        let file = ctx.Arg<File>("file")
+                        if file.Content.Position <> 0L then file.Content.Position <- 0L
+                        use reader = new System.IO.StreamReader(file.Content)
+                        { FileName = file.Name; ContentType = file.ContentType; Content = reader.ReadToEnd() }) ])
 
     let schema = Schema(Query, Mutation, Subscription, schemaConfig)
 

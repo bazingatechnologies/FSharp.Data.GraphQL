@@ -41,6 +41,7 @@
     <Compile Include="MiddlewaresTests.fs" />
     <Compile Include="NameValueLookupTests.fs" />
     <Compile Include="SubscriptionTests.fs" />
+    <Compile Include="MultipartRequestTests.fs" />
     <Compile Include="Program.fs" Condition=" '$(TargetFramework)' == 'netcoreapp2.0' " />
   </ItemGroup>
   <ItemGroup>
@@ -50,6 +51,7 @@
     <ProjectReference Include="..\..\src\FSharp.Data.GraphQL.Shared\FSharp.Data.GraphQL.Shared.fsproj" />
     <ProjectReference Include="..\..\src\FSharp.Data.GraphQL.Server\FSharp.Data.GraphQL.Server.fsproj" />
     <ProjectReference Include="..\..\src\FSharp.Data.GraphQL.Server.Middlewares\FSharp.Data.GraphQL.Server.Middlewares.fsproj" />
+    <ProjectReference Include="..\..\src\FSharp.Data.GraphQL.Server.Middlewares.AspNetCore\FSharp.Data.GraphQL.Server.Middlewares.AspNetCore.fsproj" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

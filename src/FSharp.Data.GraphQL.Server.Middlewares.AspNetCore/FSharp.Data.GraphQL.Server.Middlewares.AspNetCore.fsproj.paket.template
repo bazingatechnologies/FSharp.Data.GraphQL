@@ -1,0 +1,13 @@
+type project
+id FSharp.Data.GraphQL.Server.Middlewares.AspNetCore
+authors Bazinga Technologies Inc
+projectUrl https://github.com/bazingatechnologies/FSharp.Data.GraphQL
+licenseUrl https://github.com/bazingatechnologies/FSharp.Data.GraphQL/blob/dev/LICENSE.txt
+requireLicenseAcceptance false
+copyright Copyright (c) 2016 Bazinga Technologies Inc
+tags
+    FSharp GraphQL Relay React Middlewares ASP.NET Core
+summary
+    Built-in, generic ASP.NET Core middlewares for FSharp.Data.GraphQL.Server Executor
+description
+    Built-in, generic ASP.NET Core middlewares for FSharp.Data.GraphQL.Server Executor

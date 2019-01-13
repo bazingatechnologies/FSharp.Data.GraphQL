@@ -47,7 +47,6 @@ let rec internal compileByType (errMsg: string) (inputDef: InputDef): ExecuteInp
                 | Some x -> x
                 | None -> 
                     failwithf "Input object '%s' refers to type '%O', but constructor parameter '%s' doesn't match any of the defined input fields" objdef.Name objtype param.Name)
-
         fun value variables ->
             match value with
             | ObjectValue props ->
