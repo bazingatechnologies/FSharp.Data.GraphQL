@@ -1,5 +1,5 @@
 ﻿type project
-id FSharp.Data.GraphQL.Client
+id FSharp.Data.GraphQL.Shared
 authors Bazinga Technologies Inc
 projectUrl https://github.com/bazingatechnologies/FSharp.Data.GraphQL
 licenseUrl https://github.com/bazingatechnologies/FSharp.Data.GraphQL/blob/dev/LICENSE.txt
@@ -8,8 +8,6 @@ copyright Copyright (c) 2016 Bazinga Technologies Inc
 tags
     FSharp GraphQL Relay React
 summary
-    FSharp implementation of Facebook GraphQL query language (Client)
+    FSharp implementation of Facebook GraphQL query language (Shared components)
 description
-    FSharp implementation of Facebook GraphQL query language (Client)
-dependencies
-    FSharp.Data.GraphQL.Shared >= CURRENTVERSION
+    FSharp implementation of Facebook GraphQL query language (Shared components)

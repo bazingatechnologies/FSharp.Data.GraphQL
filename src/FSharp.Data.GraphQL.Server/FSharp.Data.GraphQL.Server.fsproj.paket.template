@@ -11,3 +11,5 @@ summary
     FSharp implementation of Facebook GraphQL query language (Server)
 description
     FSharp implementation of Facebook GraphQL query language (Server)
+dependencies
+    FSharp.Data.GraphQL.Shared >= CURRENTVERSION

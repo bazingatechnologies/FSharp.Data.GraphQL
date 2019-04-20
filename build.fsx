@@ -160,7 +160,7 @@ Target "AssemblyInfo" (fun _ ->
 
     !! "src/**/*.??proj"
     |> Seq.map getProjectDetails
-    |> Seq.iter (fun (projFileName, projectName, folderName, attributes) ->
+    |> Seq.iter (fun (projFileName, _, folderName, attributes) ->
         match projFileName with
         | Fsproj -> CreateFSharpAssemblyInfo (folderName </> "AssemblyInfo.fs") (attributes @ internalsVisibility projFileName)
         | Csproj -> CreateCSharpAssemblyInfo ((folderName </> "Properties") </> "AssemblyInfo.cs") attributes
@@ -312,7 +312,7 @@ Target "GenerateHelpDebug" (fun _ ->
 )
 
 Target "KeepRunning" (fun _ ->
-    use watcher = !! "docs/content/**/*.*" |> WatchChanges (fun changes ->
+    use watcher = !! "docs/content/**/*.*" |> WatchChanges (fun _ ->
          generateHelp' true true
     )
 
@@ -427,7 +427,6 @@ let pack id =
             Version = release.NugetVersion
             OutputPath = sprintf "nuget/%s.%s" project id
             TemplateFile = sprintf "src/%s.%s/%s.%s.fsproj.paket.template" project id project id
-            IncludeReferencedProjects = true
             MinimumFromLockFile = true
         })
 let publishPackage id =
@@ -445,6 +444,9 @@ Target "PublishClient" (fun _ ->
     publishPackage "Client"
 )
 
+Target "PublishShared" (fun _ ->
+    publishPackage "Shared")
+
 Target "PublishMiddlewares" (fun _ ->
     publishPackage "Server.Middlewares"
 )
@@ -456,6 +458,9 @@ Target "PackServer" (fun _ ->
 Target "PackClient" (fun _ ->
     pack "Client"
 )
+
+Target "PackShared" (fun _ ->
+    pack "Shared")
 
 Target "PackMiddlewares" (fun _ ->
     pack "Server.Middlewares"
