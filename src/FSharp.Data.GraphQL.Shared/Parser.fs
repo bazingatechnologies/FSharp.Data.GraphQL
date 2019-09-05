@@ -307,7 +307,7 @@ module internal Internal =
 
 
   // 2.2 Document
-  //   Definitionlist    
+  //   DefinitionList
   let documents = 
     whitespaces >>. definitions .>> (skipMany ignored <|> eof)
     |>> (fun definitions -> { Document.Definitions = definitions })
