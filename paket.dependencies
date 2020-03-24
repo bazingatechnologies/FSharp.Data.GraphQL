@@ -1,40 +1,23 @@
 source https://api.nuget.org/v3/index.json
+framework: auto-detect
 
-nuget NuGet.CommandLine
+copy_local: true
 
-# This group is needed for packages that are not needed or don't work on Mono.
-group NetCoreAndStandard
-  source https://api.nuget.org/v3/index.json
-  frameworks: netcoreapp2.0, netstandard2.0
+nuget System.Reactive
+nuget FSharp.Core ~> 4.7.0
+nuget FParsec ~> 1.1.1
 
-  # System.Net.Http is broken on Mono (see https://github.com/dotnet/corefx/issues/19914).
-  # Mono hijacks its calls to its own version of System.Net.Http, so we should not reference or include the assembly
-  # in mono releases.
-  nuget System.Net.Http 4.3.4
+group TypeProviders
+source https://api.nuget.org/v3/index.json
+framework: netstandard2.0
 
-group Common
-  source https://api.nuget.org/v3/index.json
-  frameworks: net461, netcoreapp2.0, netstandard2.0
-
-  nuget System.Reactive
-
-  # Be explicit about FSharp.Core 4.3.4 when designing libraries.
-  # See https://fsharp.github.io/2015/04/18/fsharp-core-notes.html#fsharpcore-entries-in-project-files for additional information.
-  nuget FSharp.Core 4.3.4
-  
-  # FParsec needs to be explicit for the client provider design time reference.
-  # This should not be a problem since FParsec almost never gets a new release.
-  nuget FParsec 1.0.3
-
-  # Those are needed for the client type provider.
-  nuget NETStandard.Library.NETFramework
-  github fsprojects/FSharp.TypeProviders.SDK:c8fc89b0e8bac34e321372b004de76d600651cda src/ProvidedTypes.fsi
-  github fsprojects/FSharp.TypeProviders.SDK:c8fc89b0e8bac34e321372b004de76d600651cda src/ProvidedTypes.fs
+github fsprojects/FSharp.TypeProviders.SDK src/ProvidedTypes.fsi
+github fsprojects/FSharp.TypeProviders.SDK src/ProvidedTypes.fs
 
 group TestsAndSamples
   source https://api.nuget.org/v3/index.json
-  frameworks: net47, netcoreapp2.1, netstandard2.0
-  
+  framework: auto-detect
+
   nuget FSharp.Core
   nuget Newtonsoft.Json
   nuget Suave
@@ -47,6 +30,7 @@ group TestsAndSamples
   nuget xunit.runner.visualstudio
   nuget BenchmarkDotNet
   nuget FSharp.Data.TypeProviders
+  nuget Microsoft.NETFramework.ReferenceAssemblies
 
 group Build
   source https://api.nuget.org/v3/index.json

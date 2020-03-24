@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.1;net47</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.1;netcoreapp3.1;net472</TargetFrameworks>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateProgramFile>false</GenerateProgramFile>
@@ -45,9 +45,7 @@
     <Compile Include="AstExtensionsTests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="xunit.runner.json" />
-  </ItemGroup>
+
   <ItemGroup>
     <None Include="App.config" />
     <None Include="paket.references" />
@@ -57,9 +55,6 @@
     <ProjectReference Include="..\..\src\FSharp.Data.GraphQL.Server\FSharp.Data.GraphQL.Server.fsproj" />
     <ProjectReference Include="..\..\src\FSharp.Data.GraphQL.Server.Middleware\FSharp.Data.GraphQL.Server.Middleware.fsproj" />
   </ItemGroup>
-  <ItemGroup Condition="$(OS) == Unix">
-    <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
-  </ItemGroup>
-  <Import Project="..\..\netfx.props" />
+
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

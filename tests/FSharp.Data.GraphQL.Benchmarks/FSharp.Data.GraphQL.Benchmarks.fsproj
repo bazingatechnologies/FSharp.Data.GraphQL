@@ -8,7 +8,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
+    <DebugType>portable</DebugType>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Prolog.fs" />
@@ -28,6 +28,21 @@
     <ProjectReference Include="..\..\src\FSharp.Data.GraphQL.Server\FSharp.Data.GraphQL.Server.fsproj" />
     <ProjectReference Include="..\..\src\FSharp.Data.GraphQL.Server.Middleware\FSharp.Data.GraphQL.Server.Middleware.fsproj" />
   </ItemGroup>
-  <Import Project="..\..\netfx.props" />
+
+  <!-- 
+    this is necessary because of a bug in paket that prevents assets of transitive
+    dependencies in paketized projects from being copied when they should be
+    see: https://github.com/fsprojects/Paket/issues/3810
+
+    The thing to be careful about here is to make sure these references
+    match the versions used in paket.dependencies as closely as possible
+    or else the benchmarks might be meaningless.
+  -->
+  <ItemGroup>
+    <PackageReference Include="FSharp.Core" Version="4.7.0"/>
+    <PackageReference Include="FParsec" Version="1.1.1" />
+    <PackageReference Include="System.Reactive" Version="4.3.2" />
+  </ItemGroup>
+
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

@@ -1,7 +1,7 @@
-group Common
 FSharp.Core
+
+group TypeProviders
 File:ProvidedTypes.fsi
 File:ProvidedTypes.fs
 
-group NetCoreAndStandard
-System.Net.Http
+

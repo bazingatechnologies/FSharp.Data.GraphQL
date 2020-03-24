@@ -1,5 +1,6 @@
-group TestsAndSamples
 FSharp.Core
+
+group TestsAndSamples
 Newtonsoft.Json
 Microsoft.NET.Test.Sdk
 xunit

@@ -1,64 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project>
-  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
-  <Import Project="..\..\netfx.props" />
-  <Import Project="..\..\fsc.props" />
+<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>netcoreapp2.1;net47</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.1;netcoreapp3.1;net48</TargetFrameworks>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
-  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
-  <ItemGroup>
-    <EmbeddedResource Remove=".paket\**" />
-  </ItemGroup>
+
   <ItemGroup>
     <Compile Include="Helpers.fs" />
     <Compile Include="LocalProviderTests.fs" />
     <Compile Include="SwapiLocalProviderTests.fs" />
     <Compile Include="SwapiRemoteProviderTests.fs" />
   </ItemGroup>
+
   <ItemGroup>
     <Content Include="introspection.json" />
     <Content Include="xunit.runner.json" />
   </ItemGroup>
+
   <ItemGroup>
     <None Include="paket.references" />
     <None Include="operation.graphql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+
   <ItemGroup Condition="$(OS) == Unix">
     <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.1' ">
+
+  <!-- 
+    this is needed to ensure the build order in the solution is correct, but we don't
+    want to take a reference from this mechanism because the tooling won't
+    find the TPDTC correctly (don't know why)
+  -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\FSharp.Data.GraphQL.Shared\FSharp.Data.GraphQL.Shared.fsproj">
+      <!-- <ReferenceOutputAssembly>false</ReferenceOutputAssembly> -->
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\FSharp.Data.GraphQL.Client\FSharp.Data.GraphQL.Client.fsproj">
+      <!-- <ReferenceOutputAssembly>false</ReferenceOutputAssembly> -->
+    </ProjectReference>
+  </ItemGroup>
+
+  <!--
+  <ItemGroup>
     <Reference Include="FSharp.Data.GraphQL.Client">
-      <HintPath Condition="Exists('..\..\src\FSharp.Data.GraphQL.Client\bin\Debug\netstandard2.0\FSharp.Data.GraphQL.Client.dll')">..\..\src\FSharp.Data.GraphQL.Client\bin\Debug\netstandard2.0\FSharp.Data.GraphQL.Client.dll</HintPath>
-      <HintPath Condition="Exists('..\..\src\FSharp.Data.GraphQL.Client\bin\Release\netstandard2.0\FSharp.Data.GraphQL.Client.dll')">..\..\src\FSharp.Data.GraphQL.Client\bin\Release\netstandard2.0\FSharp.Data.GraphQL.Client.dll</HintPath>
-      <HintPath Condition="Exists('..\..\bin\FSharp.Data.GraphQL.Client\netstandard2.0\FSharp.Data.GraphQL.Client.dll')">..\..\bin\FSharp.Data.GraphQL.Client\netstandard2.0\FSharp.Data.GraphQL.Client.dll</HintPath>
+      <HintPath>..\..\src\FSharp.Data.GraphQL.Client\bin\Debug\netstandard2.0\FSharp.Data.GraphQL.Client.dll</HintPath>
     </Reference>
     <Reference Include="FSharp.Data.GraphQL.Shared">
-      <HintPath Condition="Exists('..\..\src\FSharp.Data.GraphQL.Client\bin\Debug\netstandard2.0\FSharp.Data.GraphQL.Shared.dll')">..\..\src\FSharp.Data.GraphQL.Client\bin\Debug\netstandard2.0\FSharp.Data.GraphQL.Shared.dll</HintPath>
-      <HintPath Condition="Exists('..\..\src\FSharp.Data.GraphQL.Client\bin\Release\netstandard2.0\FSharp.Data.GraphQL.Shared.dll')">..\..\src\FSharp.Data.GraphQL.Client\bin\Release\netstandard2.0\FSharp.Data.GraphQL.Shared.dll</HintPath>
-      <HintPath Condition="Exists('..\..\bin\FSharp.Data.GraphQL.Client\netstandard2.0\FSharp.Data.GraphQL.Shared.dll')">..\..\bin\FSharp.Data.GraphQL.Client\netstandard2.0\FSharp.Data.GraphQL.Shared.dll</HintPath>
+      <HintPath>..\..\src\FSharp.Data.GraphQL.Client\bin\Debug\netstandard2.0\FSharp.Data.GraphQL.Shared.dll</HintPath>
     </Reference>
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net47' ">
-    <Reference Include="FSharp.Data.GraphQL.Client">
-      <HintPath Condition="Exists('..\..\src\FSharp.Data.GraphQL.Client\bin\Debug\net461\FSharp.Data.GraphQL.Client.dll')">..\..\src\FSharp.Data.GraphQL.Client\bin\Debug\net461\FSharp.Data.GraphQL.Client.dll</HintPath>
-      <HintPath Condition="Exists('..\..\src\FSharp.Data.GraphQL.Client\bin\Release\net461\FSharp.Data.GraphQL.Client.dll')">..\..\src\FSharp.Data.GraphQL.Client\bin\Release\net461\FSharp.Data.GraphQL.Client.dll</HintPath>
-      <HintPath Condition="Exists('..\..\bin\FSharp.Data.GraphQL.Client\net461\FSharp.Data.GraphQL.Client.dll')">..\..\bin\FSharp.Data.GraphQL.Client\net461\FSharp.Data.GraphQL.Client.dll</HintPath>
-    </Reference>
-    <Reference Include="FSharp.Data.GraphQL.Shared">
-      <HintPath Condition="Exists('..\..\src\FSharp.Data.GraphQL.Client\bin\Debug\net461\FSharp.Data.GraphQL.Shared.dll')">..\..\src\FSharp.Data.GraphQL.Client\bin\Debug\net461\FSharp.Data.GraphQL.Shared.dll</HintPath>
-      <HintPath Condition="Exists('..\..\src\FSharp.Data.GraphQL.Client\bin\Release\net461\FSharp.Data.GraphQL.Shared.dll')">..\..\src\FSharp.Data.GraphQL.Client\bin\Release\net461\FSharp.Data.GraphQL.Shared.dll</HintPath>
-      <HintPath Condition="Exists('..\..\bin\FSharp.Data.GraphQL.Client\net461\FSharp.Data.GraphQL.Shared.dll')">..\..\bin\FSharp.Data.GraphQL.Client\net461\FSharp.Data.GraphQL.Shared.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <Target Name="AfterBuild">
-     <!-- We need this to prevent System.Net.Http.dll to be loaded on Mono, as it does have its issues with it. See https://github.com/dotnet/corefx/issues/19914 for details. -->
-     <Delete Files="bin\$(Configuration)\$(TargetFramework)\System.Net.Http.dll" Condition=" '$(TargetFramework)' == 'net47' AND '$(OS)' == 'Unix' " />
-  </Target> 
+  -->
+
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

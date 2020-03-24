@@ -1,6 +1,7 @@
 /// The MIT License (MIT)
 /// Copyright (c) 2016 Bazinga Technologies Inc
-module FSharp.Data.GraphQL.MiddlewaresBenchmark
+module FSharp.Data.GraphQL.MiddlewareBenchmark
+open BenchmarkDotNet.Jobs
 
 #nowarn "40"
 
@@ -11,8 +12,8 @@ open BenchmarkDotNet.Attributes
 open FSharp.Data.GraphQL.Benchmarks
 open FSharp.Data.GraphQL.Server.Middleware
 
-[<Config(typeof<GraphQLBenchConfig>); MonoJob; CoreJob>]
-type SimpleExecutionWithMiddlewaresBenchmark() = 
+[<Config(typeof<GraphQLBenchConfig>); MonoJob; SimpleJob(RuntimeMoniker.NetCoreApp21)>]
+type SimpleExecutionWithMiddlewareBenchmark() = 
     let mutable schema : Schema<unit> = Unchecked.defaultof<Schema<unit>>
     let mutable middlewares : IExecutorMiddleware list = []
     let mutable schemaProcessor : Executor<unit> = Unchecked.defaultof<Executor<unit>>

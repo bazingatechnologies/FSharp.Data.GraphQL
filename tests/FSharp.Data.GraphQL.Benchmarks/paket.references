@@ -1,3 +1,6 @@
-group TestsAndSamples
+System.Reactive
 FSharp.Core
+
+group TestsAndSamples
 BenchmarkDotNet
+Microsoft.NETFramework.ReferenceAssemblies

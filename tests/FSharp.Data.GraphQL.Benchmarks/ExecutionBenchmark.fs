@@ -1,6 +1,7 @@
 ﻿/// The MIT License (MIT)
 /// Copyright (c) 2016 Bazinga Technologies Inc
 module FSharp.Data.GraphQL.ExecutionBenchmark
+open BenchmarkDotNet.Jobs
 
 #nowarn "40"
 
@@ -10,7 +11,7 @@ open FSharp.Data.GraphQL.Parser
 open BenchmarkDotNet.Attributes
 open FSharp.Data.GraphQL.Benchmarks
 
-[<Config(typeof<GraphQLBenchConfig>); MonoJob; CoreJob>]
+[<Config(typeof<GraphQLBenchConfig>); MonoJob; SimpleJob(RuntimeMoniker.NetCoreApp21)>]
 type SimpleExecutionBenchmark() = 
     let mutable schema : Schema<unit> = Unchecked.defaultof<Schema<unit>>
     let mutable asyncSchema : Schema<unit> = Unchecked.defaultof<Schema<unit>>

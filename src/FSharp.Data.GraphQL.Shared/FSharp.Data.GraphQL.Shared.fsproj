@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
+    <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
@@ -20,6 +20,6 @@
     <Compile Include="AstExtensions.fs" />
     <None Include="paket.references" />
   </ItemGroup>
-  <Import Project="..\..\netfx.props" />
+
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>
