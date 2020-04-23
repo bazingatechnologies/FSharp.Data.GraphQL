@@ -88,7 +88,7 @@ module GraphQLClient =
         |> Async.RunSynchronously
 
     /// Executes an introspection schema request to a GraphQL server asynchronously.
-    let sendIntrospectionRequestAsync (connection : GraphQLClientConnection) (serverUrl : string) httpHeaders =
+    let getIntrospectionAsync (connection : GraphQLClientConnection) (serverUrl : string) httpHeaders =
         let sendGet() = async { return! getAsync connection.Client serverUrl }
         let rethrow (exns : exn list) =
             let rec mapper (acc : string) (exns : exn list) =
@@ -101,7 +101,9 @@ module GraphQLClient =
                     | ex -> mapper (acc + ex.Message + " ") tail
             failwithf "Failure trying to recover introspection schema from server at \"%s\". Errors: %s" serverUrl (mapper "" exns)
         async {
-            try return! sendGet()
+            try 
+                let! jsonSchema = sendGet()
+                return Serialization.deserializeSchema jsonSchema
             with getex ->
                 let request =
                     { ServerUrl = serverUrl
@@ -109,13 +111,15 @@ module GraphQLClient =
                       OperationName = None
                       Query = Introspection.IntrospectionQuery
                       Variables = [||] }
-                try return! sendRequestAsync connection request
+                try
+                    let! jsonSchema = sendRequestAsync connection request
+                    return Serialization.deserializeSchema jsonSchema
                 with postex -> return rethrow [getex; postex]
         }
 
     /// Executes an introspection schema request to a GraphQL server.
-    let sendIntrospectionRequest client serverUrl httpHeaders = 
-        sendIntrospectionRequestAsync client serverUrl httpHeaders
+    let getIntrospection client serverUrl httpHeaders = 
+        getIntrospectionAsync client serverUrl httpHeaders
         |> Async.RunSynchronously
 
     /// Executes a multipart request to a GraphQL server asynchronously.
