@@ -191,7 +191,8 @@ module Schema =
             fields = [
                 Define.Field("hero", Nullable HumanType, "Gets human hero", [ Define.Input("id", String) ], fun ctx _ -> getHuman (ctx.Arg("id")))
                 Define.Field("droid", Nullable DroidType, "Gets droid", [ Define.Input("id", String) ], fun ctx _ -> getDroid (ctx.Arg("id")))
-                Define.Field("planet", Nullable PlanetType, "Gets planet", [ Define.Input("id", String) ], fun ctx _ -> getPlanet (ctx.Arg("id")))
+                // TODO: Create another sample for ObjectRef
+                Define.Field("planet", Nullable (Define.ObjectRef<Planet>("Planet")), "Gets planet", [ Define.Input("id", String) ], fun ctx _ -> getPlanet (ctx.Arg("id")))
                 Define.Field("characters", ListOf CharacterType, "Gets characters", fun _ _ -> characters) ])
 
     let Subscription =
@@ -206,7 +207,7 @@ module Schema =
                     [ Define.Input("id", String) ],
                     (fun ctx _ p -> if ctx.Arg("id") = p.Id then Some p else None)) ])
 
-    let schemaConfig = SchemaConfig.Default
+    let schemaConfig = { SchemaConfig.Default with Types = [PlanetType]}
 
     let Mutation =
         Define.Object<Root>(

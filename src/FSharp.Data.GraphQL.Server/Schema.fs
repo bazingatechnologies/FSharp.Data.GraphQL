@@ -177,6 +177,41 @@ type Schema<'Root> (query: ObjectDef<'Root>, ?mutation: ObjectDef<'Root>, ?subsc
         let m = mutation |> function Some (Named n) -> [n] | _ -> []
         let s = subscription |> function Some (Named n) -> [n] | _ -> []
         initialTypes @ s @ m @ schemaConfig.Types |> TypeMap.FromSeq
+           
+    let rec resolveTypeReference (typeDef: TypeDef): TypeDef =
+        match typeDef with
+        | :? ObjectRef as objRef ->
+
+            match typeMap.TryFind<ObjectDef> objRef.Name with
+            | Some realDef ->
+                upcast realDef // TODO: resolveObjectReferences here too
+
+            | None ->
+                failwithf "Referenced type %s not found. Please provide referenced types through SchemaConfig.Types."
+                    objRef.Name
+
+        //        | :? ObjectDef as objDef ->
+        //            upcast resolveObjectReferences (downcast objDef)
+
+        | :? NullableDef as nullDef ->
+            upcast (resolveTypeReference nullDef.OfType).MakeNullable()
+
+        | :? ListOfDef as listOfDef ->
+            upcast (resolveTypeReference listOfDef.OfType).MakeList()
+
+        | _ ->
+            typeDef
+
+    and resolveObjectReferences (objDef: ObjectDef<'a>): ObjectDef<'a> =
+        objDef.WithFields <|
+            Seq.map (fun (KeyValue (_, field)) ->
+                upcast CustomOutputFieldDefinition(field, downcast resolveTypeReference field.TypeDef)
+            ) objDef.Fields
+
+        
+        
+    let query = resolveObjectReferences query
+    let mutation = Option.map resolveObjectReferences mutation
 
     let getImplementations (typeMap : TypeMap) =
         typeMap.ToSeq()

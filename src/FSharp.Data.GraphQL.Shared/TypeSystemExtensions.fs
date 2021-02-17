@@ -38,6 +38,23 @@ type internal CustomFieldsObjectDefinition<'Val>(source : ObjectDef<'Val>, field
     override __.GetHashCode() = source.GetHashCode()
     override __.ToString() = source.ToString()
 
+type internal CustomOutputFieldDefinition<'Val, 'Res>(source : FieldDef<'Val>, typeDef: OutputDef) =
+    interface FieldDef<'Val> with
+        member __.Name = source.Name
+        member __.Description = source.Description
+        member __.DeprecationReason = source.DeprecationReason
+        member __.TypeDef = typeDef
+        member __.Args = source.Args
+        member __.Metadata = source.Metadata
+        member __.Resolve = source.Resolve
+        
+    interface IEquatable<FieldDef> with
+        member __.Equals(other) = source.Equals(other)
+        
+    override __.Equals y = source.Equals y
+    override __.GetHashCode() = source.GetHashCode()
+    override __.ToString() = source.ToString()
+
 type internal CustomResolveFieldDefinition<'Val, 'Res>(source : FieldDef<'Val>, middleware : FieldResolveMiddleware<'Val, 'Res>) =
     interface FieldDef<'Val> with
         member __.Name = source.Name

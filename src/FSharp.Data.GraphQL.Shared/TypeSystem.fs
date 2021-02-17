@@ -1230,6 +1230,44 @@ and [<CustomEquality; NoComparison>] internal ObjectDefinition<'Val> =
 
     override x.ToString() = x.Name + "!"
 
+and ObjectRef =
+    interface
+        /// Name of the object being referenced.
+        abstract Name : string
+        
+        inherit TypeDef
+        inherit NamedDef
+        inherit OutputDef
+        inherit CompositeDef
+    end
+
+and ObjectRef<'Val> =
+    interface
+        inherit ObjectRef 
+        inherit TypeDef<'Val>
+        inherit OutputDef<'Val>
+    end
+    
+and internal ObjectReference<'Val> =
+    { Name: string }
+    
+    interface TypeDef with
+        member __.Type = typeof<'Val>
+
+        member x.MakeNullable() =
+            let nullable : NullableDefinition<_> = { OfType = x }
+            upcast nullable
+
+        member x.MakeList() =
+            let list: ListOfDefinition<_,_> = { OfType = x }
+            upcast list
+            
+    interface ObjectRef<'Val> with
+        member x.Name = x.Name
+        
+    interface NamedDef with
+        member x.Name = x.Name
+
 /// A GraphQL interface type defintion. Interfaces are composite
 /// output types, that can be implemented by GraphQL objects.
 and InterfaceDef =
@@ -1853,6 +1891,8 @@ and TypeMap() =
                 |> Seq.iter insert
                 odef.Implements
                 |> Seq.iter insert
+            | :? ObjectRef ->
+                ()
             | :? InterfaceDef as idef ->
                 add idef.Name def overwrite
                 idef.Fields
@@ -2771,6 +2811,14 @@ module SchemaDefinitions =
                                |> Map.ofList)
                      Implements = defaultArg (Option.map List.toArray interfaces) [||]
                      IsTypeOf = isTypeOf }
+        
+        /// <summary>
+        /// A reference to an Object in the schema. Useful when declaring mutually recursive types across files.
+        /// Pass types directly whenever possible.
+        /// </summary>
+        /// <param name="name">Type name to reference.</param>
+        static member ObjectRef(name : string) : ObjectRef<'Val> =
+            upcast { ObjectReference.Name = name }
 
         /// <summary>
         /// Creates a custom GraphQL input object type. Unlike GraphQL objects, input objects are valid input types,
