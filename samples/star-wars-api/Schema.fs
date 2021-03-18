@@ -3,6 +3,8 @@
 open FSharp.Data.GraphQL
 open FSharp.Data.GraphQL.Types
 open FSharp.Data.GraphQL.Server.Middleware
+open FSharp.Data.GraphQL.Samples.StarWarsApi.Middleware
+open FSharp.Data.GraphQL.Samples.StarWarsApi.Authorization
 
 #nowarn "40"
 
@@ -32,9 +34,6 @@ type Planet =
     member x.SetMoon b =
         x.IsMoon <- b
         x
-
-type Root =
-    { RequestId: string }
 
 type Character =
     | Human of Human
@@ -223,11 +222,11 @@ module Schema =
                             x.SetMoon(Some(ctx.Arg("isMoon"))) |> ignore
                             schemaConfig.SubscriptionProvider.Publish<Planet> "watchMoon" x
                             schemaConfig.LiveFieldSubscriptionProvider.Publish<Planet> "Planet" "isMoon" x
-                            x))])
+                            x)).WithAuthorizationPolicies<Planet>(Policies.CanSetMoon)])
 
     let schema : ISchema<Root> = upcast Schema(Query, Mutation, Subscription, schemaConfig)
 
-    let middlewares = 
+    let middlewares =
         [ Define.QueryWeightMiddleware(2.0, true)
           Define.ObjectListFilterMiddleware<Human, Character option>(true)
           Define.ObjectListFilterMiddleware<Droid, Character option>(true)
