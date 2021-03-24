@@ -5,7 +5,7 @@
   <Import Project="..\..\fsc.props" />
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>netcoreapp3.1;net47</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1;net48</TargetFrameworks>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
@@ -45,7 +45,7 @@
       <HintPath Condition="Exists('..\..\bin\FSharp.Data.GraphQL.Client\netstandard2.0\FSharp.Data.GraphQL.Shared.dll')">..\..\bin\FSharp.Data.GraphQL.Client\netstandard2.0\FSharp.Data.GraphQL.Shared.dll</HintPath>
     </Reference>
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net47' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net48' ">
     <Reference Include="FSharp.Data.GraphQL.Client">
       <HintPath Condition="Exists('..\..\src\FSharp.Data.GraphQL.Client\bin\Debug\net461\FSharp.Data.GraphQL.Client.dll')">..\..\src\FSharp.Data.GraphQL.Client\bin\Debug\net461\FSharp.Data.GraphQL.Client.dll</HintPath>
       <HintPath Condition="Exists('..\..\src\FSharp.Data.GraphQL.Client\bin\Release\net461\FSharp.Data.GraphQL.Client.dll')">..\..\src\FSharp.Data.GraphQL.Client\bin\Release\net461\FSharp.Data.GraphQL.Client.dll</HintPath>
@@ -60,6 +60,6 @@
   <Target Name="AfterBuild">
      <!-- We need this to prevent System.Net.Http.dll to be loaded on Mono, as it does have its issues with it. See https://github.com/dotnet/corefx/issues/19914 for details. -->
      <Delete Files="bin\$(Configuration)\$(TargetFramework)\System.Net.Http.dll" Condition=" '$(TargetFramework)' == 'net47' AND '$(OS)' == 'Unix' " />
-  </Target> 
+  </Target>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

@@ -26,22 +26,3 @@ module StringHelpers =
 
     let isNullOrWhiteSpace (str : string) =
         String.IsNullOrWhiteSpace(str)
-
-[<AutoOpen>]
-module JsonHelpers =
-    let tryGetJsonProperty (jobj: JObject) prop =
-        match jobj.Property(prop) with
-        | null -> None
-        | p -> Some(p.Value.ToString())
-
-    let jsonSerializerSettings (converters : JsonConverter seq) =
-        JsonSerializerSettings()
-        |> tee (fun s ->
-            s.Converters <- List<JsonConverter>(converters)
-            s.ContractResolver <- CamelCasePropertyNamesContractResolver())
-
-    let jsonSerializer (converters : JsonConverter seq) =
-        JsonSerializer()
-        |> tee (fun c ->
-            Seq.iter c.Converters.Add converters
-            c.ContractResolver <- CamelCasePropertyNamesContractResolver())

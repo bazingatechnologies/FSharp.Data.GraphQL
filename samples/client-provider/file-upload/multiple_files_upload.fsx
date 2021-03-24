@@ -14,6 +14,7 @@
 //Uncomment those to use dotnet build command for the client assembly using netstandard2.0
 #r "../../../src/FSharp.Data.GraphQL.Shared/bin/Debug/netstandard2.0/FSharp.Data.GraphQL.Shared.dll"
 #r "../../../src/FSharp.Data.GraphQL.Client/bin/Debug/netstandard2.0/netstandard.dll"
+#r "../../../src/FSharp.Data.GraphQL.Client/bin/Debug/netstandard2.0/Microsoft.Extensions.Http.dll"
 #r "../../../src/FSharp.Data.GraphQL.Client/bin/Debug/netstandard2.0/FSharp.Data.GraphQL.Client.dll"
 
 open System
@@ -33,7 +34,7 @@ let mutation =
     }""">()
 
 let upload() =
-    let input = 
+    let input =
         [| new Upload(File.OpenRead("txt_file.txt"), "text.txt", ownsStream = true)
            new Upload(File.OpenRead("png_file.png"), "image.png", ownsStream = true) |]
     let request = MyProvider.Types.MultipleUploadRequest(input)

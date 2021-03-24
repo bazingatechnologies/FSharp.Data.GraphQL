@@ -1,15 +1,17 @@
 namespace FSharp.Data.GraphQL.Samples.StarWarsApi
 
 open System
+open System.Collections.Generic
+open System.Collections.Concurrent
+open System.Text.Json
+open System.Text.Json.Serialization
 open System.Threading
 open System.Threading.Tasks
 open System.Net.WebSockets
 open Microsoft.AspNetCore.Http
-open Newtonsoft.Json
 open FSharp.Data.GraphQL
 open FSharp.Data.GraphQL.Execution
-open System.Collections.Generic
-open System.Collections.Concurrent
+
 
 type GraphQLWebSocket(innerSocket : WebSocket) =
     inherit WebSocket()
@@ -64,11 +66,11 @@ module SocketManager =
         socket.Dispose()
 
     let private sendMessage (socket : GraphQLWebSocket) (message : WebSocketServerMessage) = async {
-        let settings =
+        let options =
             WebSocketServerMessageConverter() :> JsonConverter
-            |> Seq.singleton
-            |> jsonSerializerSettings
-        let json = JsonConvert.SerializeObject(message, settings)
+            |> Array.singleton
+            |> Json.getSerializerOptions
+        let json = JsonSerializer.Serialize(message, options)
         let buffer = utf8Bytes json
         let segment = new ArraySegment<byte>(buffer)
         if socket.State = WebSocketState.Open then
@@ -88,11 +90,11 @@ module SocketManager =
         then
             return None
         else
-            let settings =
+            let options =
                 WebSocketClientMessageConverter(executor, replacements) :> JsonConverter
-                |> Seq.singleton
-                |> jsonSerializerSettings
-            return JsonConvert.DeserializeObject<WebSocketClientMessage>(message, settings) |> Some
+                |> Array.singleton
+                |> Json.getSerializerOptions
+            return JsonSerializer.Deserialize<WebSocketClientMessage>(message, options) |> Some
     }
 
     let private handleMessages (executor : Executor<'Root>) (root : unit -> 'Root) (socket : GraphQLWebSocket) = async {

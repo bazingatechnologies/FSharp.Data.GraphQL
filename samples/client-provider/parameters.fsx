@@ -14,13 +14,14 @@
 //Uncomment those to use dotnet build command for the client assembly using netstandard2.0
 #r "../../src/FSharp.Data.GraphQL.Shared/bin/Debug/netstandard2.0/FSharp.Data.GraphQL.Shared.dll"
 #r "../../src/FSharp.Data.GraphQL.Client/bin/Debug/netstandard2.0/netstandard.dll"
+#r "../../src/FSharp.Data.GraphQL.Client/bin/Debug/netstandard2.0/Microsoft.Extensions.Http.dll"
 #r "../../src/FSharp.Data.GraphQL.Client/bin/Debug/netstandard2.0/FSharp.Data.GraphQL.Client.dll"
 
 open FSharp.Data.GraphQL
 
 type MyProvider = GraphQLProvider<"http://localhost:8084">
 
-let operation = 
+let operation =
     MyProvider.Operation<"""query q($id: String!) {
       hero(id: $id) {
         name

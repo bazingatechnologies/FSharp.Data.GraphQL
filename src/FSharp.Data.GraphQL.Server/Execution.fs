@@ -15,7 +15,7 @@ open FSharp.Data.GraphQL.Helpers
 
 type Error = string * obj list
 
-type Output = IDictionary<string, obj>
+type Output = IReadOnlyDictionary<string, obj>
 
 type GQLResponse =
     { Content : GQLResponseContent
@@ -54,8 +54,8 @@ let (|Direct|Deferred|Stream|) (response : GQLResponse) =
 /// can be set, but no new entry can be added or removed, once lookup
 /// has been initialized.
 /// This dicitionay implements structural equality.
-type NameValueLookup(keyValues: KeyValuePair<string, obj> []) =
-    let kvals = keyValues |> Array.distinctBy (fun kv -> kv.Key)
+type NameValueLookup(keyValues: KeyValuePair<string, obj> seq) =
+    let kvals = keyValues |> Seq.distinctBy (fun kv -> kv.Key) |> Seq.toArray
     let setValue key value =
         let mutable i = 0
         while i < kvals.Length do
@@ -93,7 +93,7 @@ type NameValueLookup(keyValues: KeyValuePair<string, obj> []) =
             if lookup.Count > 0 then
                 sb.Append("{ ") |> ignore
                 lookup.Buffer
-                |> Array.iter (fun kv -> 
+                |> Array.iter (fun kv ->
                     sb.Append(kv.Key).Append(": ") |> ignore
                     stringify sb (deep+1) kv.Value
                     sb.Append(",\r\n") |> ignore
@@ -103,7 +103,7 @@ type NameValueLookup(keyValues: KeyValuePair<string, obj> []) =
             sb.Append("\"").Append(s).Append("\"") |> ignore
         | :? System.Collections.IEnumerable as s ->
             sb.Append("[") |> ignore
-            for i in s do 
+            for i in s do
                 stringify sb (deep + 1) i
                 sb.Append(", ") |> ignore
             sb.Append("]") |> ignore
@@ -116,6 +116,9 @@ type NameValueLookup(keyValues: KeyValuePair<string, obj> []) =
     member __.Buffer : KeyValuePair<string, obj> [] = kvals
     /// Return a number of entries stored in current lookup. It's fixed size.
     member __.Count = kvals.Length
+    member __.Item
+        with get (key) = getValue key
+        and  set (key) value = setValue key value
     /// Updates an entry's value under given key. It will throw an exception
     /// if provided key cannot be found in provided lookup.
     member __.Update key value = setValue key value
@@ -138,26 +141,13 @@ type NameValueLookup(keyValues: KeyValuePair<string, obj> []) =
         member __.GetEnumerator() = (kvals :> System.Collections.IEnumerable).GetEnumerator()
     interface IEnumerable<KeyValuePair<string, obj>> with
         member __.GetEnumerator() = (kvals :> IEnumerable<KeyValuePair<string, obj>>).GetEnumerator()
-    interface IDictionary<string, obj> with
-        member __.Add(_, _) = raise (NotSupportedException "NameValueLookup doesn't allow to add/remove entries")
-        member __.Add(_) = raise (NotSupportedException "NameValueLookup doesn't allow to add/remove entries")
-        member __.Clear() = raise (NotSupportedException "NameValueLookup doesn't allow to add/remove entries")
-        member __.Contains(item) = kvals |> Array.exists ((=) item)
+    interface IReadOnlyDictionary<string, obj> with
         member __.ContainsKey(key) = kvals |> Array.exists (fun kv -> kv.Key = key)
-        member __.CopyTo(array, arrayIndex) = kvals.CopyTo(array, arrayIndex)
         member x.Count = x.Count
-        member __.IsReadOnly = true
         member __.Item
             with get (key) = getValue key
-            and set (key) v = setValue key v
         member __.Keys = upcast (kvals |> Array.map (fun kv -> kv.Key))
         member __.Values = upcast (kvals |> Array.map (fun kv -> kv.Value))
-        member __.Remove(_:string) =
-            raise (NotSupportedException "NameValueLookup doesn't allow to add/remove entries")
-            false
-        member __.Remove(_:KeyValuePair<string,obj>) =
-            raise (NotSupportedException "NameValueLookup doesn't allow to add/remove entries")
-            false
         member __.TryGetValue(key, value) =
             match kvals |> Array.tryFind (fun kv -> kv.Key = key) with
             | Some kv -> value <- kv.Value; true
@@ -233,8 +223,8 @@ let private createFieldContext objdef argDefs ctx (info: ExecutionInfo) =
       ParentType = objdef
       Schema = ctx.Schema
       Args = args
-      Variables = ctx.Variables }         
-                
+      Variables = ctx.Variables }
+
 let private resolveField (execute: ExecuteField) (ctx: ResolveFieldContext) (parentValue: obj) =
     if ctx.ExecutionInfo.IsNullable
     then
@@ -460,7 +450,7 @@ and private live (ctx : ResolveFieldContext) (path : obj list) (parent : obj) (v
         match filter with
         | Some filterFn -> provider.Add (filterFn parent) typeName name |> Observable.bind resolveUpdate
         | None -> failwithf "No live provider for %s:%s" typeName name
-  
+
     executeResolvers ctx path parent (value |> Some |> AsyncVal.wrap)
     |> AsyncVal.map(Result.map(fun (data, deferred, errs) -> (data, Some <| Option.fold Observable.merge2 updates deferred, errs)))
 
@@ -528,7 +518,7 @@ and executeObjectFields (fields : ExecutionInfo list) (objName : string) (objDef
         | Ok(kvps, def, errs) -> return Ok (KeyValuePair(objName, box <| NameValueLookup(kvps)), def, errs)
     }
 
-let internal compileSubscriptionField (subfield: SubscriptionFieldDef) = 
+let internal compileSubscriptionField (subfield: SubscriptionFieldDef) =
     match subfield.Resolve with
     | Resolve.BoxedFilterExpr(_, _, _, filter) -> fun ctx a b -> filter ctx a b |> AsyncVal.wrap |> AsyncVal.toAsync
     | Resolve.BoxedAsyncFilterExpr(_, _, _, filter) -> filter

@@ -1,11 +1,12 @@
 source https://api.nuget.org/v3/index.json
+storage: none
 
 nuget NuGet.CommandLine
 
 # This group is needed for packages that are not needed or don't work on Mono.
 group NetCoreAndStandard
   source https://api.nuget.org/v3/index.json
-  frameworks: netcoreapp2.0, netstandard2.0
+  frameworks: netcoreapp2.1, netstandard2.0
 
   # System.Net.Http is broken on Mono (see https://github.com/dotnet/corefx/issues/19914).
   # Mono hijacks its calls to its own version of System.Net.Http, so we should not reference or include the assembly
@@ -14,14 +15,14 @@ group NetCoreAndStandard
 
 group Common
   source https://api.nuget.org/v3/index.json
-  frameworks: net461, netcoreapp2.0, netstandard2.0
+  frameworks: net461, netcoreapp2.1, netstandard2.0
 
   nuget System.Reactive
 
   # Be explicit about FSharp.Core 4.3.4 when designing libraries.
   # See https://fsharp.github.io/2015/04/18/fsharp-core-notes.html#fsharpcore-entries-in-project-files for additional information.
   nuget FSharp.Core 4.3.4
-  
+
   # FParsec needs to be explicit for the client provider design time reference.
   # This should not be a problem since FParsec almost never gets a new release.
   nuget FParsec 1.0.3
@@ -34,8 +35,8 @@ group Common
 
 group TestsAndSamples
   source https://api.nuget.org/v3/index.json
-  frameworks: net47, netcoreapp3.1, netstandard2.0
-  
+  frameworks: net48, netcoreapp3.1, netstandard2.0
+
   nuget Microsoft.Extensions.Http 5
   nuget System.Net.Http 4.3.4
   nuget FSharp.Core
@@ -43,9 +44,11 @@ group TestsAndSamples
   nuget Suave
   nuget Giraffe
   nuget Microsoft.NET.Test.Sdk
-  nuget xunit 
+  nuget xunit
   nuget xunit.runner.utility
   nuget xunit.runner.console
   nuget xunit.runner.visualstudio
   nuget BenchmarkDotNet
   nuget FSharp.Data.TypeProviders
+  nuget FSharp.SystemTextJson
+  nuget Dahomey.Json

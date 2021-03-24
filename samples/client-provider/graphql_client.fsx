@@ -14,6 +14,7 @@
 //Uncomment those to use dotnet build command for the client assembly using netstandard2.0
 #r "../../src/FSharp.Data.GraphQL.Shared/bin/Debug/netstandard2.0/FSharp.Data.GraphQL.Shared.dll"
 #r "../../src/FSharp.Data.GraphQL.Client/bin/Debug/netstandard2.0/netstandard.dll"
+#r "../../src/FSharp.Data.GraphQL.Client/bin/Debug/netstandard2.0/Microsoft.Extensions.Http.dll"
 #r "../../src/FSharp.Data.GraphQL.Client/bin/Debug/netstandard2.0/FSharp.Data.GraphQL.Client.dll"
 
 open FSharp.Data.GraphQL
@@ -25,7 +26,7 @@ let run () =
           { Query = """query q { viewer { login } }"""
             Variables = [||]
             ServerUrl = "https://api.github.com/graphql"
-            HttpHeaders = 
+            HttpHeaders =
                   [| "Authorization", "bearer [your bearer token here]"
                      "User-Agent", "[your github username here]" |]
             OperationName = Some "q" }
