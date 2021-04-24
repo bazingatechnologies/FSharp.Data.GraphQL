@@ -58,7 +58,7 @@ let executor =
             fieldsFn = fun () ->
                 [ Define.Field("id", Int, resolve = fun _ a -> a.id)
                   Define.Field("value", String, resolve = fun _ a -> a.value)
-                  Define.Field("subjects", Nullable (ListOf (Nullable SubjectType)),
+                  Define.Field("subjects", Nullable (SeqOf (Nullable SubjectType)),
                     resolve = fun _ (a : A) -> a.subjects |> List.map getSubject |> List.toSeq |> Some)
                     .WithQueryWeight(1.0) ])
     and BType =
@@ -68,7 +68,7 @@ let executor =
             fieldsFn = fun () ->
                 [ Define.Field("id", Int, resolve = fun _ b -> b.id)
                   Define.Field("value", String, resolve = fun _ b -> b.value)
-                  Define.Field("subjects", Nullable (ListOf (Nullable SubjectType)),
+                  Define.Field("subjects", Nullable (SeqOf (Nullable SubjectType)),
                     resolve = fun _ (b : B) -> b.subjects |> List.map getSubject |> List.toSeq |> Some)
                     .WithQueryWeight(1.0) ])
     let Query =

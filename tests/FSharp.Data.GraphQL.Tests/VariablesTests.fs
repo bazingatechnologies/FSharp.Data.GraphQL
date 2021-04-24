@@ -21,7 +21,7 @@ let TestComplexScalar =
 
 type TestInput = {
     a: string option
-    b: string option seq option
+    b: string option list option
     c: string
     d: string option
 }
@@ -74,10 +74,10 @@ let TestType =
         Define.Field("fieldWithDefaultArgumentValue", String, "", [ Define.Input("input", Nullable String, Some "hello world") ], stringifyInput)
         Define.Field("fieldWithNestedInputObject", String, "", [ Define.Input("input", TestNestedInputObject, { na = None; nb = "hello world"}) ], stringifyInput)
         Define.Field("fieldWithEnumInput", String, "", [ Define.Input("input", EnumTestType) ], stringifyInput)
-        Define.Field("list", String, "", [ Define.Input("input", Nullable(ListOf (Nullable String))) ], stringifyInput)
+        Define.Field("list", String, "", [ Define.Input("input", Nullable(SeqOf (Nullable String))) ], stringifyInput)
         Define.Field("nnList", String, "", [ Define.Input("input", ListOf (Nullable String)) ], stringifyInput)
-        Define.Field("listNN", String, "", [ Define.Input("input", Nullable (ListOf String)) ], stringifyInput)
-        Define.Field("nnListNN", String, "", [ Define.Input("input", ListOf String) ], stringifyInput)
+        Define.Field("listNN", String, "", [ Define.Input("input", Nullable (SeqOf String)) ], stringifyInput)
+        Define.Field("nnListNN", String, "", [ Define.Input("input", SeqOf String) ], stringifyInput)
     ])
 
 let schema = Schema(TestType)

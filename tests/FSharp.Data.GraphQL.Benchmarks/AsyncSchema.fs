@@ -43,7 +43,7 @@ module AsyncSchemaDefinition =
                     fieldsFn = fun () ->
                         [ Define.AsyncField("id", String, resolve = fun _ person -> delay person.Id)
                           Define.AsyncField("name", Nullable String, resolve = fun _ person -> delay person.Name)
-                          Define.AsyncField("friends", Nullable(ListOf(Nullable Person)),
+                          Define.AsyncField("friends", Nullable(SeqOf(Nullable Person)),
                                        resolve = fun _ person ->
                                            person.Friends
                                            |> List.map getPerson

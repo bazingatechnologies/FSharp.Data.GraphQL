@@ -1,0 +1,24 @@
+type project
+id FSharp.Data.GraphQL.Server.AspNet
+authors Bazinga Technologies Inc
+projectUrl https://github.com/bazingatechnologies/FSharp.Data.GraphQL
+licenseUrl https://github.com/bazingatechnologies/FSharp.Data.GraphQL/blob/dev/LICENSE.txt
+requireLicenseAcceptance false
+copyright Copyright (c) 2016 Bazinga Technologies Inc
+tags
+    FSharp GraphQL Relay React AspNet
+summary
+    Asp.Net integration for FSharp.Data.GraphQL.Server
+description
+    Asp.Net integration for FSharp.Data.GraphQL.Server
+dependencies
+	framework: netstandard2.0
+		FSharp.Core >= LOCKEDVERSION-Common
+        System.Text.Json >= LOCKEDVERSION-AspNetLib
+        Microsoft.AspNetCore.Http >= LOCKEDVERSION-AspNetLib
+        Microsoft.AspNetCore.Http.Abstractions >= LOCKEDVERSION-AspNetLib
+        Microsoft.AspNetCore.Http.Extensions >= LOCKEDVERSION-AspNetLib
+        FSharp.Data.GraphQL.Shared >= CURRENTVERSION
+        FSharp.Data.GraphQL.Server >= CURRENTVERSION
+files
+	bin/Release/netstandard2.0/FSharp.Data.GraphQL.Server.AspNet.dll ==> lib/netstandard2.0

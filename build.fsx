@@ -253,6 +253,9 @@ Target.create "PackMiddleware" (fun _ ->
     pack "Server.Middleware"
 )
 
+Target.create "PackAspNet" (fun _ ->
+    pack "Server.AspNet"
+)
 
 // --------------------------------------------------------------------------------------
 // Run all targets by default. Invoke 'build -t <Target>' to override
@@ -278,6 +281,7 @@ Target.create "PackAll" ignore
   ==> "PackServer"
   ==> "PackClient"
   ==> "PackMiddleware"
+  ==> "PackAspNet"
   ==> "PackAll"
 
 Target.runOrDefault "All"

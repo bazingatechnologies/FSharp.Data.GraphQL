@@ -40,8 +40,6 @@ module SimpleOperation =
     type Operation = Provider.Operations.Q
 
     let validateResult (input : Input option) (result : Operation.OperationResult) =
-        result.CustomData.ContainsKey("requestType") |> equals true
-        result.CustomData.["requestType"] |> equals (box "Classic")
         result.Data.IsSome |> equals true
         input |> Option.iter (fun input ->
             result.Data.Value.Echo.IsSome |> equals true
@@ -211,8 +209,6 @@ module SingleRequiredUploadOperation =
     type Operation = Provider.Operations.SingleUpload
 
     let validateResult (file : File) (result : Operation.OperationResult) =
-        result.CustomData.ContainsKey("requestType") |> equals true
-        result.CustomData.["requestType"] |> equals (box "Multipart")
         result.Data.IsSome |> equals true
         result.Data.Value.SingleUpload.Name |> equals file.Name
         result.Data.Value.SingleUpload.ContentAsText |> equals file.Content
@@ -244,8 +240,6 @@ module SingleOptionalUploadOperation =
     type Operation = Provider.Operations.NullableSingleUpload
 
     let validateResult (file : File option) (result : Operation.OperationResult) =
-        result.CustomData.ContainsKey("requestType") |> equals true
-        result.CustomData.["requestType"] |> equals (box "Multipart")
         result.Data.IsSome |> equals true
         file |> Option.iter (fun file ->
         result.Data.Value.NullableSingleUpload.IsSome |> equals true
@@ -290,8 +284,6 @@ module RequiredMultipleUploadOperation =
     type Operation = Provider.Operations.MultipleUpload
 
     let validateResult (files : File []) (result : Operation.OperationResult) =
-        result.CustomData.ContainsKey("requestType") |> equals true
-        result.CustomData.["requestType"] |> equals (box "Multipart")
         result.Data.IsSome |> equals true
         let receivedFiles =
             result.Data.Value.MultipleUpload
@@ -328,8 +320,6 @@ module OptionalMultipleUploadOperation =
     type Operation = Provider.Operations.NullableMultipleUpload
 
     let validateResult (files : File [] option) (result : Operation.OperationResult) =
-        result.CustomData.ContainsKey("requestType") |> equals true
-        result.CustomData.["requestType"] |> equals (box "Multipart")
         result.Data.IsSome |> equals true
         let receivedFiles =
             result.Data.Value.NullableMultipleUpload
@@ -377,8 +367,6 @@ module OptionalMultipleOptionalUploadOperation =
     type Operation = Provider.Operations.NullableMultipleNullableUpload
 
     let validateResult (files : File option [] option) (result : Operation.OperationResult) =
-        result.CustomData.ContainsKey("requestType") |> equals true
-        result.CustomData.["requestType"] |> equals (box "Multipart")
         result.Data.IsSome |> equals true
         let receivedFiles =
             result.Data.Value.NullableMultipleNullableUpload
@@ -464,8 +452,6 @@ module UploadRequestOperation =
     type Request = Provider.Types.UploadRequest
 
     let validateResult (request : FilesRequest) (result : Operation.OperationResult) =
-        result.CustomData.ContainsKey("requestType") |> equals true
-        result.CustomData.["requestType"] |> equals (box "Multipart")
         result.Data.IsSome |> equals true
         result.Data.Value.UploadRequest.Single.ToDictionary() |> File.FromDictionary |> equals request.Single
         result.Data.Value.UploadRequest.Multiple |> Array.map ((fun x -> x.ToDictionary()) >> File.FromDictionary) |> equals request.Multiple

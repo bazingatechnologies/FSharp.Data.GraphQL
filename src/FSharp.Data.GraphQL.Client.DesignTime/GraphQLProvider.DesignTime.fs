@@ -13,7 +13,6 @@ type GraphQLTypeProvider (config) as this =
     inherit TypeProviderForNamespaces(config,
                                       assemblyReplacementMap = [
                                           "FSharp.Data.GraphQL.Client.DesignTime", "FSharp.Data.GraphQL.Client"
-                                          "FSharp.Data.GraphQL.Shared", "FSharp.Data.GraphQL.Shared"
                                         ],
                                       addDefaultProbingLocation = true)
 
@@ -21,14 +20,6 @@ type GraphQLTypeProvider (config) as this =
     let asm = Assembly.GetExecutingAssembly()
 
     do this.AddNamespace(ns, [Provider.makeProvidedType(asm, ns, config.ResolutionFolder)])
-
-    override this.ResolveAssembly args =
-        if args.Name.Contains("FSharp.Data.GraphQL") then
-            printfn "ResolveAssembly: %s" args.Name
-            config.ReferencedAssemblies
-            |> Array.filter(fun x -> x.Contains("FSharp.Data"))
-            |> Array.iter (fun x ->  printfn "%s" x)
-        base.ResolveAssembly args
 
 [<assembly:TypeProviderAssembly>]
 do()

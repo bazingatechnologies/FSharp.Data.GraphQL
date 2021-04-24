@@ -10,6 +10,7 @@ open System.Collections.Generic
 open FSharp.Data.GraphQL.Ast
 open FSharp.Data.GraphQL.Types
 open FSharp.Data.GraphQL.Types.Patterns
+open FSharp.Data.GraphQL.Helpers
 
 /// Tries to convert type defined in AST into one of the type defs known in schema.
 let inline tryConvertAst schema ast =
@@ -112,7 +113,11 @@ let rec private coerceVariableValue isNullable typedef (vardef: VarDef) (input: 
         | Some res -> res
     | Nullable (Input innerdef) ->
         let some, none = ReflectionHelper.optionOfType innerdef.Type
-        let coerced = coerceVariableValue true innerdef vardef input errMsg
+        let nullableInput =
+            match input with
+            | ObjectOption inner -> inner
+            | _ -> input
+        let coerced = coerceVariableValue true innerdef vardef nullableInput errMsg
         if coerced <> null
         then
             let s = some coerced

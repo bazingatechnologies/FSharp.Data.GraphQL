@@ -1,0 +1,8 @@
+group Common
+FSharp.Core
+
+group AspNetLib
+System.Text.Json
+Microsoft.AspNetCore.Http
+Microsoft.AspNetCore.Http.Abstractions
+Microsoft.AspNetCore.Http.Extensions
