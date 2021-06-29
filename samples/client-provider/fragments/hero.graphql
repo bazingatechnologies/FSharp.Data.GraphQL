@@ -1,0 +1,5 @@
+fragment HeroFragment on Human {
+    hisName: name
+    appearsIn
+    homePlanet
+}

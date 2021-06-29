@@ -35,7 +35,11 @@
     <Compile Include="..\FSharp.Data.GraphQL.Client\GraphQLClient.fs" />
     <Compile Include="..\FSharp.Data.GraphQL.Client\GraphQLProviderRuntimeContext.fs" />
     <Compile Include="DesignTimeCache.fs" />
-    <Compile Include="ProvidedTypesHelper.fs" />
+    <Compile Include="Helpers.fs" />
+    <Compile Include="ProvidedSchema.fs" />
+    <Compile Include="SchemaGenerator.fs" />
+    <Compile Include="OperationGenerator.fs" />
+    <Compile Include="Provider.fs" />
     <Compile Include="GraphQLProvider.DesignTime.fs" />
     <None Include="paket.references" />
   </ItemGroup>

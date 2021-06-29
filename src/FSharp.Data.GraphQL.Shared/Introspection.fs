@@ -7,11 +7,6 @@ module FSharp.Data.GraphQL.Introspection
 open FSharp.Data.GraphQL.Types
 open FSharp.Data.GraphQL.Types.Introspection
 open FSharp.Data.GraphQL.Extensions
-open System.Reflection
-
-let internal getFieldValue name o =
-    let property = o.GetType().GetTypeInfo().GetDeclaredProperty(name, ignoreCase=true)
-    if isNull property then null else property.GetValue(o, null)
 
 /// Common GraphQL query that may be used to retrieve overall data
 /// about schema type system itself.
@@ -183,7 +178,7 @@ let rec __Type =
         Define.Field("kind", __TypeKind, fun _ t -> t.Kind)
         Define.Field("name", Nullable String, resolve = fun _ t -> t.Name)
         Define.Field("description", Nullable String, resolve = fun _ t -> t.Description)
-        Define.Field("fields", Nullable (ListOf __Field),
+        Define.Field("fields", Nullable (SeqOf __Field),
             args = [Define.Input("includeDeprecated", Boolean, false) ],
             resolve = fun ctx t ->
                 match t.Name with
@@ -193,19 +188,19 @@ let rec __Type =
                     match ctx.TryArg "includeDeprecated" with
                     | Some true ->  found.Fields |> Option.map Array.toSeq
                     | _ -> found.Fields |> Option.map (fun x -> upcast Array.filter (fun f -> not f.IsDeprecated) x))
-        Define.Field("interfaces", Nullable (ListOf __Type), resolve = fun ctx t ->
+        Define.Field("interfaces", Nullable (SeqOf __Type), resolve = fun ctx t ->
             match t.Name with
             | None -> None
             | Some name ->
                 let found = findIntrospected ctx name
                 found.Interfaces |> Option.map Array.toSeq )
-        Define.Field("possibleTypes", Nullable (ListOf __Type), resolve = fun ctx t ->
+        Define.Field("possibleTypes", Nullable (SeqOf __Type), resolve = fun ctx t ->
             match t.Name with
             | None -> None
             | Some name ->
                 let found = findIntrospected ctx name
                 found.PossibleTypes |> Option.map Array.toSeq)
-        Define.Field("enumValues", Nullable (ListOf __EnumValue),
+        Define.Field("enumValues", Nullable (SeqOf __EnumValue),
             args = [Define.Input("includeDeprecated", Boolean, false) ], resolve = fun ctx t ->
             match t.Name with
             | None -> None
@@ -214,7 +209,7 @@ let rec __Type =
                 match ctx.TryArg "includeDeprecated" with
                 | None | Some false -> found.EnumValues |> Option.map Array.toSeq
                 | Some true -> found.EnumValues |> Option.map (fun x -> upcast  (x |> Array.filter (fun f -> not f.IsDeprecated))))
-        Define.Field("inputFields", Nullable (ListOf __InputValue), resolve = fun ctx t ->
+        Define.Field("inputFields", Nullable (SeqOf __InputValue), resolve = fun ctx t ->
             match t.Name with
             | None -> None
             | Some name ->
@@ -248,7 +243,7 @@ and __Field =
     [
         Define.Field("name", String, fun _ f -> f.Name)
         Define.Field("description", Nullable String, fun _ f -> f.Description)
-        Define.Field("args", ListOf __InputValue, fun _ f -> f.Args)
+        Define.Field("args", ArrayOf __InputValue, fun _ f -> f.Args)
         Define.Field("type", __Type, fun _ f -> f.Type)
         Define.Field("isDeprecated", Boolean, resolve = fun _ f -> f.IsDeprecated)
         Define.Field("deprecationReason", Nullable String, fun _ f -> f.DeprecationReason)
@@ -286,8 +281,8 @@ and __Directive =
     [
         Define.Field("name", String, resolve = fun _ directive -> directive.Name)
         Define.Field("description", Nullable String, resolve = fun _ directive -> directive.Description)
-        Define.Field("locations", ListOf __DirectiveLocation, resolve = fun _ directive -> directive.Locations)
-        Define.Field("args", ListOf __InputValue, resolve = fun _ directive -> directive.Args)
+        Define.Field("locations", ArrayOf __DirectiveLocation, resolve = fun _ directive -> directive.Locations)
+        Define.Field("args", ArrayOf __InputValue, resolve = fun _ directive -> directive.Args)
         Define.Field("onOperation", Boolean, resolve = fun _ d -> d.Locations |> Seq.exists (oneOf [| DirectiveLocation.QUERY; DirectiveLocation.MUTATION; DirectiveLocation.SUBSCRIPTION |]))
         Define.Field("onFragment", Boolean, resolve = fun _ d -> d.Locations |> Seq.exists (oneOf [| DirectiveLocation.FRAGMENT_SPREAD; DirectiveLocation.INLINE_FRAGMENT; DirectiveLocation.FRAGMENT_DEFINITION |]))
         Define.Field("onField", Boolean, resolve = fun _ d -> d.Locations |> Seq.exists (oneOf [| DirectiveLocation.FIELD |]))
@@ -302,9 +297,9 @@ and __Schema =
     description = "A GraphQL Schema defines the capabilities of a GraphQL server. It exposes all available types and directives on the server, as well as the entry points for query, mutation, and subscription operations.",
     fieldsFn = fun () ->
     [
-        Define.Field("types", ListOf __Type, description = "A list of all types supported by this server.", resolve = fun _ schema -> schema.Types |> Array.map IntrospectionTypeRef.Named)
+        Define.Field("types", ArrayOf __Type, description = "A list of all types supported by this server.", resolve = fun _ schema -> schema.Types |> Array.map IntrospectionTypeRef.Named)
         Define.Field("queryType", __Type, description = "The type that query operations will be rooted at.", resolve = fun _ schema -> schema.QueryType)
         Define.Field("mutationType", Nullable __Type, description = "If this server supports mutation, the type that mutation operations will be rooted at.", resolve = fun _ schema -> schema.MutationType)
         Define.Field("subscriptionType", Nullable __Type, description = "If this server support subscription, the type that subscription operations will be rooted at.", resolve = fun _ schema -> schema.SubscriptionType)
-        Define.Field("directives", ListOf __Directive, description = "A list of all directives supported by this server.", resolve = fun _  schema -> schema.Directives)
+        Define.Field("directives", ArrayOf __Directive, description = "A list of all directives supported by this server.", resolve = fun _  schema -> schema.Directives)
     ])

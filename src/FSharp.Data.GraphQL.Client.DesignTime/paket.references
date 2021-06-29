@@ -1,5 +1,6 @@
 group Common
 FSharp.Core
+System.Text.Json
 FParsec
 Microsoft.Extensions.Http
 File:ProvidedTypes.fsi

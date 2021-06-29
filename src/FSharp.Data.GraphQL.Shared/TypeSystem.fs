@@ -2520,7 +2520,20 @@ module SchemaDefinitions =
 
     /// Wraps a GraphQL type definition, allowing defining field/argument
     /// to take collection of provided value.
-    let ListOf(innerDef : #TypeDef<'Val>) : ListOfDef<'Val, 'Seq> = upcast { ListOfDefinition.OfType = innerDef }
+    let ListOf(innerDef : #TypeDef<'Val>) : ListOfDef<'Val, 'Val list> = upcast { ListOfDefinition.OfType = innerDef }
+
+    /// Wraps a GraphQL type definition, allowing defining field/argument
+    /// to take collection of provided value.
+    let SeqOf(innerDef : #TypeDef<'Val>) : ListOfDef<'Val, 'Val seq> = upcast { ListOfDefinition.OfType = innerDef }
+
+    /// Wraps a GraphQL type definition, allowing defining field/argument
+    /// to take collection of provided value.
+    let ArrayOf(innerDef : #TypeDef<'Val>) : ListOfDef<'Val, 'Val array> = upcast { ListOfDefinition.OfType = innerDef }
+
+
+    /// Wraps a GraphQL type definition, allowing defining field/argument
+    /// to take collection of provided value.
+    let SetOf(innerDef : #TypeDef<'Val>) : ListOfDef<'Val, 'Val Set> = upcast { ListOfDefinition.OfType = innerDef }
 
     let private ignoreInputResolve (_ : unit) (input : 'T) = ()
 

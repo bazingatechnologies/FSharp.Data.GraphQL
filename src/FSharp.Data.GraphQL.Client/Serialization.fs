@@ -4,14 +4,142 @@
 namespace FSharp.Data.GraphQL.Client
 
 open System
+open System.Text.Json
+open System.Text.Json.Serialization
 open Microsoft.FSharp.Reflection
 open System.Reflection
 open System.Collections.Generic
+open System.Collections.Concurrent
 open System.Globalization
 open FSharp.Data.GraphQL
 open FSharp.Data.GraphQL.Client.ReflectionPatterns
 
+type OptionConverter<'T>() =
+    inherit JsonConverter<option<'T>>()
+
+    override _.Read(reader, _typeToConvert, options) =
+        match reader.TokenType with
+        | JsonTokenType.Null -> None
+        | _ -> Some <| JsonSerializer.Deserialize<'T>(&reader, options)
+
+    override _.Write(writer, value, options) =
+        match value with
+        | None -> writer.WriteNullValue()
+        | Some x -> JsonSerializer.Serialize<'T>(writer, x, options)
+
+type OptionConverterFactory () =
+    inherit JsonConverterFactory()
+    let optionTypeConverter = typedefof<OptionConverter<_>>
+    override _.CanConvert(typeToConvert) =
+        typeToConvert.IsGenericType && typeToConvert.GetGenericTypeDefinition() = typedefof<option<_>>
+
+    override _.CreateConverter(typeToConvert, options) =
+        optionTypeConverter
+            .MakeGenericType(typeToConvert.GetGenericArguments())
+            .GetConstructor([||])
+            .Invoke([||]) :?> JsonConverter
+
+
+type RecordConverter<'T> () =
+    inherit JsonConverter<'T>()
+    let isNullableField (propertyInfo: PropertyInfo) =
+        let propType = propertyInfo.PropertyType
+        propType.IsGenericType &&
+            (let genericType = propType.GetGenericTypeDefinition()
+             genericType = typedefof<option<_>> || genericType = typedefof<voption<_>>)
+
+    let makeRecord = FSharpValue.PreComputeRecordConstructor(typeof<'T>, true)
+    let readRecord = FSharpValue.PreComputeRecordReader(typeof<'T>, true)
+
+    let recordFields =
+        let flags = BindingFlags.Public ||| BindingFlags.NonPublic
+        [| for field in FSharpType.GetRecordFields(typeof<'T>, flags) do
+           (field.Name, isNullableField field, field.PropertyType) |]
+
+    let fieldDefaults =
+        [| for (_,_,fieldType) in recordFields do
+            if fieldType.IsValueType
+            then Activator.CreateInstance(fieldType)
+            else null |]
+
+    let tryGetFieldPosition =
+        let cache = ConcurrentDictionary<bool * string, int option>()
+        fun (caseInsensitive: bool) (propertyName: string) ->
+            let key = (caseInsensitive, propertyName)
+            match cache.TryGetValue key with
+            | true, v ->
+                v
+            | false, _ ->
+                let stringCompare = if caseInsensitive then StringComparison.InvariantCultureIgnoreCase else StringComparison.InvariantCulture
+                let index = recordFields |> Array.tryFindIndex(fun (v, _, _) -> String.Equals(v, propertyName, stringCompare))
+                cache.[key] <- index
+                index
+
+    override _.Read(reader, typeToConvert, options) =
+        if reader.TokenType <> JsonTokenType.StartObject then
+            failwith "Expected Json Start Object Token"
+        let mutable cont = true
+        let values = Array.copy fieldDefaults
+        let tryGetPosition = tryGetFieldPosition options.PropertyNameCaseInsensitive
+        while cont do
+            match reader.Read(), reader.TokenType with
+            | true, JsonTokenType.EndObject ->
+                cont <- false
+            | true, JsonTokenType.PropertyName ->
+                let propertyName = reader.GetString()
+                match tryGetPosition propertyName with
+                | Some pos ->
+                    let (fieldName, isNullable, propertyType) = recordFields.[pos]
+                    let value = JsonSerializer.Deserialize(&reader, propertyType, options)
+                    if (not isNullable) && isNull value then
+                        failwithf "Field '%s' is required" fieldName
+                    values.[pos] <- value
+                | None ->
+                    reader.Skip()
+                    ()
+            | false, _ ->
+                failwith "Unexpected End of JSON Sequence"
+            | _, token ->
+                failwithf "Unexpected token '%A' in JSON Sequence" token
+        let record = makeRecord values
+        record :?> 'T
+
+
+    override _.Write(writer, value, options) =
+        writer.WriteStartObject()
+        let values = readRecord value
+        let normalizeName =
+            if isNull options.PropertyNamingPolicy
+            then id
+            else options.PropertyNamingPolicy.ConvertName
+        for i = 0 to values.Length - 1 do
+            let (name, _, propertyType) = recordFields.[i]
+            writer.WritePropertyName(normalizeName name)
+            JsonSerializer.Serialize(writer, values.[i], propertyType, options)
+        writer.WriteEndObject()
+
+type RecordConverterFactory () =
+    inherit JsonConverterFactory()
+    let recordTypeConverter = typedefof<RecordConverter<_>>
+
+    override _.CanConvert(typeToConvert) =
+        FSharpType.IsRecord(typeToConvert, true)
+
+    override _.CreateConverter(typeToConvert, options) =
+        recordTypeConverter
+            .MakeGenericType(typeToConvert)
+            .GetConstructor([||])
+            .Invoke([||]) :?> JsonConverter
+
+
 module Serialization =
+
+    let options = JsonSerializerOptions(PropertyNameCaseInsensitive=true, PropertyNamingPolicy=JsonNamingPolicy.CamelCase)
+    options.Converters.Add(OptionConverterFactory())
+    options.Converters.Add(RecordConverterFactory())
+    options.Converters.Add(JsonStringEnumConverter())
+
+
     let private makeOption t (value : obj) =
         let otype = typedefof<_ option>
         let cases = FSharpType.GetUnionCases(otype.MakeGenericType([|t|]))
@@ -134,7 +262,7 @@ module Serialization =
     let deserializeRecord<'T> (json : string) : 'T =
         let t = typeof<'T>
         Tracer.runAndMeasureExecutionTime (sprintf "Deserialized JSON string to record type %s." (t.ToString())) (fun _ ->
-        downcast (JsonValue.Parse(json) |> convert t))
+        JsonSerializer.Deserialize<'T>(json, options))
 
     let deserializeMap values =
         let rec helper (values : (string * JsonValue) []) =

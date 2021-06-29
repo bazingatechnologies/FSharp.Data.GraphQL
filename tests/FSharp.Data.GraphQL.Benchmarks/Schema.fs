@@ -41,7 +41,7 @@ module SchemaDefinition =
                     fieldsFn = fun () ->
                         [ Define.Field("id", String, resolve = fun _ person -> person.Id)
                           Define.Field("name", Nullable String, resolve = fun _ person -> person.Name)
-                          Define.Field("friends", Nullable(ListOf(Nullable Person)),
+                          Define.Field("friends", Nullable(SeqOf(Nullable Person)),
                                        resolve = fun _ person ->
                                            person.Friends
                                            |> List.map getPerson

@@ -1,0 +1,12 @@
+fragment CharacterFragment on Character {
+     ... on Human {
+        humanName: name
+        appearsIn
+        homePlanet
+    }
+    ... on Droid {
+        droidName: name
+        appearsIn
+        primaryFunction
+    }
+}

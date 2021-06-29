@@ -1,4 +1,5 @@
 group Common
+System.Text.Json
 FSharp.Core
 FParsec
 Microsoft.Extensions.Http

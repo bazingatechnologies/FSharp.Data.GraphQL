@@ -4,7 +4,13 @@
 
 open FSharp.Data.GraphQL
 
-type MyProvider = GraphQLProvider<"swapi_schema.json">
+let [<Literal>] fragmentsFolder = __SOURCE_DIRECTORY__ + "/fragments"
+type MyProvider = GraphQLProvider<"swapi_schema.json", fragmentsFolder="fragments", resolutionFolder=__SOURCE_DIRECTORY__>
+
+(***
+type HeroFragment = MyProvider.Fragments.HeroFragment
+type Droid = MyProvider.Fragments.CharacterFragment.Droid
+**)
 
 let operation =
     MyProvider.Operation<"""query TestQuery {

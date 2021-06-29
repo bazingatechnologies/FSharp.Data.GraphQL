@@ -10,18 +10,19 @@ open FSharp.Data.GraphQL.Client
 open ProviderImplementation.ProvidedTypes
 open FSharp.Data.GraphQL.Validation
 
-type internal ProviderKey =
+type internal ProviderSettings =
     { IntrospectionLocation : IntrospectionLocation
       CustomHttpHeadersLocation : StringLocation
       UploadInputTypeName : string option
       ResolutionFolder : string
       ClientQueryValidation: bool
-      ExplicitOptionalParameters: bool }
+      ExplicitOptionalParameters: bool
+      FragmentsFolder: string option }
 
 module internal ProviderDesignTimeCache =
     let private expiration = CacheExpirationPolicy.SlidingExpiration(TimeSpan.FromSeconds 30.0)
-    let private cache = MemoryCache<ProviderKey, ProvidedTypeDefinition>(expiration)
-    let getOrAdd (key : ProviderKey) (defMaker : unit -> ProvidedTypeDefinition) =
+    let private cache = MemoryCache<ProviderSettings, ProvidedTypeDefinition>(expiration)
+    let getOrAdd (key : ProviderSettings) (defMaker : unit -> ProvidedTypeDefinition) =
         cache.GetOrAddResult key defMaker
 
 module internal QueryValidationDesignTimeCache =

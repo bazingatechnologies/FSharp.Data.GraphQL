@@ -6,6 +6,7 @@ group Common
   source https://api.nuget.org/v3/index.json
   frameworks: net5.0, netstandard2.0
 
+  nuget System.Text.Json
   nuget System.Reactive
 
   # Be explicit about FSharp.Core 4.7.2 when designing libraries.
@@ -39,3 +40,13 @@ group TestsAndSamples
   nuget xunit.runner.visualstudio
   nuget BenchmarkDotNet
   nuget FSharp.Data.TypeProviders
+
+group AspNetLib
+  source https://api.nuget.org/v3/index.json
+  frameworks: net5.0, netstandard2.0
+
+  nuget Microsoft.AspNetCore.Http
+  nuget Microsoft.AspNetCore.Http.Abstractions
+  nuget Microsoft.AspNetCore.Http.Extensions
+  nuget System.Text.Json
+  nuget System.IO.Pipelines
